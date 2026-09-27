@@ -1,6 +1,6 @@
 # Application Layer (Services, DTOs)
 
-Project: `{Solution}.Application`. It references Domain only.
+Project: `{Solution}.Application`. It references Domain only. 
 
 NuGet packages:
 - `Microsoft.Extensions.Logging.Abstractions`
