@@ -263,6 +263,116 @@ public sealed class ProductsController(IProductService productService) : Control
 
 Controllers contain no try/catch, no logging of failures (the exception handler does that) and no data access.
 
+## Skinny Controllers: No Business Code in the Presentation Layer
+
+The Api project is a **translation layer between HTTP and application services**. It holds no business rules. Every controller must be skinny, and every other Api type (middleware, filters, attributes, helpers) must deal with HTTP concerns only.
+
+### What a controller action may do
+
+1. **Accept and validate input**: route/query/body binding, data-annotation validation via `[ApiController]`, and HTTP-level attributes (`[Authorize]`, rate limiting, body limits, anti-forgery).
+2. **Call application services**: exactly **one** service call per action (a use case). If an action needs two or more service calls to finish its job, that orchestration is a use case and belongs in a service method.
+3. **Return the HTTP response**: pick the status code (`Ok`, `CreatedAtRoute`, `NoContent`, …), and read or write purely HTTP artifacts (cookies, headers, `Location`), using values the service returned.
+
+Anything that doesn't fit one of these three steps is business code and must move to the Application layer (or into the Domain entity when it's an invariant).
+
+### What is forbidden in the Api project
+
+| Forbidden in controllers / Api types | Move it to |
+|---|---|
+| `DbContext`, repositories, `IUnitOfWork`, `FromSql*`, `SqlConnection` | Infrastructure, behind a service |
+| Domain entities in signatures, locals or `new Entity(...)` | Application service returning DTOs |
+| Branching on business rules (`if (user.Status == ...)`, `switch` on domain state, permission/role decisions beyond `[Authorize]`) | Service method or domain entity |
+| Calculations, aggregation or LINQ over results (`.Where`, `.Sum`, `.OrderBy`, `.GroupBy`, `.Select` that reshapes data) | Service (query in the database) |
+| Loops over data (`foreach`/`for`/`while`) | Service |
+| Mapping entity → DTO, or composing DTOs from several service results | Application mapping extensions / service |
+| Orchestrating several services, or calling `SaveChanges` | Service method (one per use case) |
+| `try`/`catch` for business outcomes, or translating exceptions to status codes | Typed exceptions + `GlobalExceptionHandler` |
+| Hard-coded business values (limits, durations, role names, magic strings) | Options classes / domain constants |
+| Validation beyond shape (uniqueness, existence, state checks) | Service (throws `ConflictException`/`NotFoundException`/`InvalidRequestException`) |
+
+HTTP-only logic is allowed and expected in the Api layer, e.g. writing or clearing a session cookie from a token the service returned, reading a header, or setting `Location`. The test is: *would this logic still exist if the same use case were exposed through a CLI or a message queue?* If yes, it's business code and must not live in the Api project.
+
+### Example: fat controller → skinny controller
+
+Fat (rejected):
+
+```csharp
+[HttpPost("{id:guid}/suspend")]
+public async Task<IActionResult> Suspend(Guid id, [FromBody] StatusRequest request, CancellationToken cancellationToken)
+{
+    var user = await _users.GetByIdAsync(id, cancellationToken);          // repository in a controller
+    if (user is null)
+    {
+        return NotFound();
+    }
+
+    if (user.Roles.Any(r => r.RoleCode == RoleCodes.SystemAdministrator)) // business rule
+    {
+        return Conflict("The last administrator cannot be suspended.");
+    }
+
+    user.Suspend(request.Reason);                                          // domain behaviour driven from the controller
+    await _unitOfWork.SaveChangesAsync(cancellationToken);                 // transaction boundary in a controller
+    return Ok(user.ToDto());
+}
+```
+
+Skinny (accepted):
+
+```csharp
+[HttpPost("{id:guid}/suspend")]
+[ProducesResponseType<UserDto>(StatusCodes.Status200OK)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+public async Task<ActionResult<UserDto>> Suspend(Guid id, [FromBody] StatusRequest request, CancellationToken cancellationToken) =>
+    Ok(await _userAdministration.SuspendAsync(id, request, cancellationToken));
+```
+
+The lookup, the last-administrator rule, the state change and `SaveChangesAsync` all live in `UserAdministrationService.SuspendAsync`, which throws `NotFoundException`/`ConflictException`. `GlobalExceptionHandler` maps those to 404/409.
+
+### Validation procedure (run on every review and before deployment)
+
+Check **every** file under `src/*.Api/` (controllers, `Middleware/`, `Security/`, filters, helpers), not just a sample. Run these from the solution root. Each hit must be either fixed or justified as an HTTP-only concern in the report.
+
+1. **Data access in the Api layer**: must return nothing.
+   ```bash
+   grep -rnE "DbContext|Repository|IUnitOfWork|SaveChanges|FromSql|ExecuteSql|SqlConnection" src/*.Api --include=*.cs | grep -v "Program.cs"
+   ```
+2. **Domain types in controllers**: must return nothing. Controllers use DTOs only. Domain constants (e.g. `RoleCodes` in an `[Authorize(Roles = ...)]` attribute) are the only allowed exception.
+   ```bash
+   grep -rnE "using [A-Za-z.]+\.Domain" src/*.Api/Controllers --include=*.cs
+   ```
+3. **Branching and loops in controllers**: review every hit. Allowed only for HTTP concerns (e.g. choosing `NoContent` vs `Ok`, or whether to clear a cookie).
+   ```bash
+   grep -rnE "\b(if|else|switch|foreach|for|while)\b|\?\s*[^?:]+\s*:" src/*.Api/Controllers --include=*.cs
+   ```
+4. **LINQ / calculations in controllers**: must return nothing.
+   ```bash
+   grep -rnE "\.(Where|Select|SelectMany|Sum|Count|Any|All|OrderBy|OrderByDescending|GroupBy|Aggregate|First|FirstOrDefault|Single|Max|Min)\(" src/*.Api/Controllers --include=*.cs
+   ```
+5. **Exception handling in controllers**: must return nothing. Exceptions go through `GlobalExceptionHandler`.
+   ```bash
+   grep -rnE "\btry\b|\bcatch\b" src/*.Api/Controllers --include=*.cs
+   ```
+6. **One service call per action**: for each action, count awaited service calls. More than one means the orchestration belongs in a service.
+7. **Action size**: an action body (excluding attributes and XML docs) longer than ~10 lines is a smell. Anything that isn't bind → one service call → return must be justified.
+8. **Injected dependencies**: controller constructors may take only application service interfaces (`I*Service`) and presentation helpers (e.g. cookie writers, `IRequestContext`). Any other dependency needs a justification.
+9. **Non-controller Api types** (middleware, filters, attributes): they may inspect and shape the HTTP request/response (headers, cookies, body limits, CSRF, rate limits, exception → ProblemDetails). They must not make business decisions. Authorization decisions delegate to an Application-layer resolver/policy (e.g. `IActorResolver`, `AccessPolicies`) rather than re-implementing the rules.
+
+### Reporting
+
+Finish the review with this block. List every controller, with ✅ (skinny), ❌ (violation, with `file:line`, the rule broken and the target service method) or ⚠️ (HTTP-only logic kept on purpose, with the reason):
+
+```
+Skinny controller check
+- ✅ ProductsController
+- ❌ OrdersController.Cancel: refund calculation in controller (src/Catalog.Api/Controllers/OrdersController.cs:58) → move to IOrderService.CancelAsync
+- ⚠️ AuthController.Login: writes session cookie from LoginResult (HTTP-only concern)
+- ✅ Middleware/Security: no business rules
+```
+
+Never tick a controller from memory. Open each file and run the checks above.
+
 ## appsettings.json (all configuration lives here)
 
 ```json

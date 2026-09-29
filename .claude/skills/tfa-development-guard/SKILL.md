@@ -1,6 +1,6 @@
 ---
 name: tfa-development-guard
-description: 'Build and review .NET/C# code using Clean Architecture (Domain, Application, Infrastructure, Presentation) with EF Core code-first + SQL Server migrations, read-only SQL Server view access, base/entity repositories, application services, DTOs, controllers, appsettings-driven configuration, audit and full structured logging, and a pre-deployment checklist. Use when creating or reviewing .NET solutions, adding entities/features that read or write the database, mapping database views, scaffolding DbContext/repositories/services/controllers, preparing a deployment, or checking C# code against project best practices.'
+description: 'Build and review .NET/C# code using Clean Architecture (Domain, Application, Infrastructure, Presentation) with EF Core code-first + SQL Server migrations, read-only SQL Server view access, base/entity repositories, application services, DTOs, controllers, appsettings-driven configuration, audit and full structured logging, and a pre-deployment checklist. Use when creating or reviewing .NET solutions, adding entities/features that read or write the database, mapping database views, scaffolding DbContext/repositories/services/controllers, preparing a deployment, refactoring C# code (skinny controllers, extracting services, reducing duplication and nesting), or checking C# code against project best practices.'
 ---
 
 # .NET/C# Best Practices (Clean Architecture + EF Core)
@@ -46,7 +46,7 @@ Load the file for the layer you are working on. Each one has complete, compilabl
 | [references/domain-layer.md](references/domain-layer.md) | `BaseEntity`, entity models, `DomainException`, `IRepository<T>`, entity repository interfaces, `IUnitOfWork` |
 | [references/infrastructure-layer.md](references/infrastructure-layer.md) | `AppDbContext`, `IEntityTypeConfiguration<T>`, audit interceptor, `Repository<T>` base, entity repositories, `DatabaseOptions`, DI registration, migrations |
 | [references/application-layer.md](references/application-layer.md) | DTOs and request records, mapping extensions, service interface + implementation, application exceptions, pagination options, DI registration |
-| [references/presentation-layer.md](references/presentation-layer.md) | `Program.cs`, Serilog setup, global exception handler, example controller, `appsettings.json` / `appsettings.Development.json`, NuGet packages |
+| [references/presentation-layer.md](references/presentation-layer.md) | `Program.cs`, Serilog setup, global exception handler, example controller, skinny-controller rules and validation procedure, `appsettings.json` / `appsettings.Development.json`, NuGet packages |
 | [references/read-only-views.md](references/read-only-views.md) | Read-only access to SQL Server views: `ReadOnlyDbContext` (SaveChanges blocked), `ToView` mappings, `IReadOnlyRepository<T>`, `DataAccessGuard` error handling, audit logging (`IAuditLogger`, `ICurrentUser`), report service and controller, read-only tests |
 
 ## Workflow: Adding an Entity End to End
@@ -182,10 +182,79 @@ For a **database view** (read-only), follow the same order using [references/rea
 
 ## Code Quality
 
-- Follow SOLID principles.
-- Avoid duplication by using the base repository, mapping extensions and shared base classes.
-- Use names that reflect domain concepts.
-- Keep methods small, focused and cohesive.
+- Follow SOLID principles, and use names that reflect domain concepts.
+- **DRY (Don't Repeat Yourself)**: if the same logic appears twice, extract it into a reusable service, extension method or helper class. Also reuse the base repository, mapping extensions and shared base classes.
+- **Single Responsibility Principle**: each class and method does one thing and does it well. If a method has more than one responsibility, split it into focused, single-purpose methods.
+- **Skinny controllers, fat services**: controllers are thin orchestrators that delegate to application services. Business logic belongs in services (and domain entities), never in controllers. A controller action may only:
+  1. accept and validate input,
+  2. call service methods,
+  3. return the appropriate HTTP response.
+- **Early returns and guard clauses**: avoid deep nesting. Handle invalid arguments, error conditions and edge cases at the top of the method and return or throw immediately. The happy path stays unindented at the end.
+- **Small, focused functions**: keep methods under 20–25 lines where possible. When a method grows longer, extract well-named private helpers. Each method should be understandable at a glance.
+- **Modularity**: organize code into logical namespaces and project layers. Group related functionality by feature (`{Solution}.{Layer}.{Feature}`), following Clean Architecture (the layout above) or Vertical Slice Architecture where the project already uses it. Don't mix the two within one feature.
+
+## Refactoring Workflow
+
+When asked to refactor, or when a review finds code-quality violations, follow these steps in order. **Refactoring never changes behavior.** If a behavior change is needed, report it separately and do it as its own task.
+
+### 1. Analyze
+
+Read the code thoroughly before changing anything: its purpose, inputs, outputs and side effects (database writes, audit/log records, cookies, idempotency ledger entries, thrown exceptions and the HTTP status each maps to). Find the tests that cover it. If coverage is missing for behavior you're about to touch, add characterization tests first.
+
+### 2. Identify issues
+
+Look for:
+
+- Business logic in controllers (it belongs in services; see [presentation-layer.md](references/presentation-layer.md#skinny-controllers-no-business-code-in-the-presentation-layer))
+- Code duplication
+- Long or complex methods (more than 25 lines)
+- Deep nesting (more than 3 levels)
+- Multiple responsibilities in one class or method
+- Missing or incorrect nullable annotations
+- Captive dependencies (a singleton holding a scoped service such as `DbContext`, a repository or `ICurrentUser`)
+- N+1 queries (a query inside a loop, or lazy navigation access per row). Use `Include`, projection or one batched query instead.
+- Synchronous I/O that should be async
+- A `CancellationToken` that isn't propagated down to EF Core and other I/O
+- Exceptions used for flow control, i.e. thrown and caught locally to steer logic. Typed exceptions that surface to `GlobalExceptionHandler` are the project standard and are **not** flow control.
+- Magic numbers or strings that should be constants or options (appsettings)
+- Missing argument or request validation
+- Places where modern C# features would help readability
+
+### 3. Plan
+
+Before editing, outline the strategy and share it with the user:
+
+- Which logic moves from controllers to services?
+- What can be extracted into separate methods, classes or extension methods?
+- What can be simplified with early returns or pattern matching?
+- Which duplicated code can be consolidated, and where does the shared version live (which layer and namespace)?
+- Which modern C# features improve readability?
+- Should CQRS/MediatR be introduced? Only propose it. Adding MediatR is a new dependency and an architecture change, so it needs the user's approval and is never part of a behavior-preserving refactor. If the project doesn't already use it, the default answer is no.
+
+### 4. Execute incrementally
+
+Make one kind of change at a time, in this order, and run the tests after each step:
+
+1. Extract business logic from controllers into services.
+2. Extract duplicated code into reusable methods or classes.
+3. Apply early returns and guard clauses to reduce nesting.
+4. Split large methods into smaller ones.
+5. Rename symbols for clarity. Use `mcp__jetbrains__rename_refactoring` when that tool is available, because it updates every reference safely. Otherwise rename with the IDE, or search all references (`grep -rn "\bOldName\b"`) and update each one, then build. Never rename persisted names (tables, columns, JSON contract fields, API routes, audit action codes) as part of a refactor, because that changes behavior.
+6. Add proper nullable annotations and explicit type declarations.
+7. Apply modern C# features: records, pattern matching, collection expressions, primary constructors.
+8. Introduce the Result pattern for error handling **only if the project already uses it or the user approves it**. The standard in this skill is typed exceptions mapped by `GlobalExceptionHandler` (see [Error Handling](#error-handling)). Don't mix both styles in one feature.
+
+### 5. Preserve behavior
+
+The refactored code must behave identically: same outputs, same side effects, same exception types, HTTP status codes and ProblemDetails, same log and audit records, and the same database queries in effect. Don't fix bugs, change validation rules or alter public contracts while refactoring. List any bugs you find and handle them separately.
+
+### 6. Run tests
+
+Run `dotnet test` (or the project's verified test command) after each step above, not only at the end. If a test fails, stop and fix or revert that step before continuing. Never report tests as passing without running them. If tests can't be run, say so explicitly.
+
+### 7. Document changes
+
+Finish with a summary of what was refactored and why, organized by step. For each change, give the file, the issue it fixed (from step 2) and the specific improvement (e.g. "`UsersController.Create` 38 → 4 lines, logic moved to `UserAdministrationService.CreateAsync`"). Include the test command and its result, and anything left undone.
 
 ## Pre-Deployment Checklist
 
@@ -217,6 +286,7 @@ Pre-deployment checklist
 | 11 | Parameterized queries used | LINQ only, or `FromSql`/`FromSqlInterpolated`/`ExecuteSql`. `grep -rn "FromSqlRaw\|ExecuteSqlRaw\|SqlCommand" src/` finds no concatenated or interpolated input. |
 | 12 | Connection pooling enabled | `AddDbContextPool` (with `Database:DbContextPoolSize`), plus `Pooling=True;Min Pool Size=5;Max Pool Size=100` in every connection string. No manually created, undisposed `SqlConnection`. |
 | 13 | Timeout configured (30 seconds) | `Database:CommandTimeoutSeconds = 30`, applied through `sql.CommandTimeout(...)`, and `Connect Timeout=30` in every connection string. |
+| 14 | Skinny controllers, no business code in the Api layer | Every controller and Api type passes the [validation procedure in presentation-layer.md](references/presentation-layer.md#validation-procedure-run-on-every-review-and-before-deployment): no data access, no domain types, no business branching, LINQ or try/catch, one service call per action. Print the "Skinny controller check" block. |
 
 Also confirm before release:
 - `EnableSensitiveDataLogging` and `EnableDetailedErrors` are `false` in Production settings.
@@ -228,6 +298,14 @@ Also confirm before release:
 When reviewing code, flag any of the following:
 - [ ] A layer references a project that the dependency rule forbids, or Domain has EF/ASP.NET dependencies
 - [ ] A controller uses `DbContext` or a repository directly, or returns entities instead of DTOs
+- [ ] A controller action contains business logic (branching on domain rules, calculations, multiple service orchestration steps) instead of delegating to a service
+- [ ] Duplicated logic (the same code in two or more places) that should be a shared service, extension method or helper
+- [ ] A class or method with more than one responsibility
+- [ ] Deep nesting (more than three levels) where guard clauses and early returns would flatten it
+- [ ] Captive dependencies (a singleton holding a scoped service), N+1 queries, or synchronous I/O
+- [ ] Exceptions caught locally to steer logic, magic numbers/strings, or missing validation
+- [ ] A method longer than ~25 lines that could be split into focused helpers
+- [ ] Code placed in the wrong layer or namespace for its feature
 - [ ] A repository calls `SaveChanges`, or a service calls it more than once per use case
 - [ ] A read query is missing `AsNoTracking()`, or a list is filtered in memory
 - [ ] A hard-coded connection string, timeout, page size or log level
