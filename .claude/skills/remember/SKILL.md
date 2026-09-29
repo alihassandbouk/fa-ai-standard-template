@@ -47,7 +47,7 @@ Only what a colleague — equally skilled, knowing nothing about today — would
 ### What not to capture
 
 - Implementation details visible in the code
-- Anything already documented in context files, specs, or ADRs
+- Anything already documented in context files, or ADRs
 - The process of how something was built — only what was built and what was decided
 - Status that belongs in Jira (ticket states, sprint progress)
 - Secrets or credential-like values
@@ -82,7 +82,7 @@ Omit empty sections. Half a screen is usually right.
 Review the draft entry and ask, for each item:
 
 1. **Is this a decision with lasting consequences?** → It needs an ADR. Offer to draft one in `docs/adr/` now (numbered, never edited, superseded only).
-2. **Is this a requirement or a change to one?** → It belongs in `specs/`, via a PR (Gate A).
+
 3. **Is this a convention the agent should follow every session?** → It belongs in a context file or `CLAUDE.md`.
 
 Tell the developer what you found:
@@ -114,7 +114,7 @@ Next session: run /remember restore to pick up from here.
 
 ### Step 1 — Find the latest entry
 
-Read the most recent file in `diary/` and take its **last entry only**. Do not read the whole diary — it is an archive, not a context file. If `diary/` is missing or empty:
+Read the 3 most recent files in `diary/` and take its **3 last entry only**. Do not read the whole diary — it is an archive, not a context file. If `diary/` is missing or empty:
 
 ```
 No diary entries found in this repo.
@@ -124,7 +124,7 @@ To save at the end of a session, run /remember save.
 
 ### Step 2 — Read the essentials
 
-The latest entry, plus `CLAUDE.md` if not already loaded. Nothing else. If the developer's question concerns older work ("why did we change the retry policy"), **search** the repo diary (grep) or the global diary (`diary search ...`) for that topic and read the matching entries only.
+The 3 latest entry, plus `CLAUDE.md` if not already loaded. Nothing else. If the developer's question concerns older work ("why did we change the retry policy"), **search** the repo diary (grep) or the global diary (`diary search ...`) for that topic and read the matching entries only.
 
 ### Step 3 — Confirm what was restored
 

@@ -32,3 +32,24 @@ everything else in this repo.
                                   # /imprint, /spec-review, /spec-generate,
                                   # /remember)
 ```
+
+## Recommended tools
+
+### playwright-cli
+
+Browser automation for agents — drive pages, take snapshots, run tests.
+Repo: <https://github.com/microsoft/playwright-cli>
+
+```bash
+npm install -g @playwright/cli@latest
+playwright-cli install --skills   # adds the playwright-cli skill for Claude Code
+```
+
+### Impeccable
+
+Design skill for building, critiquing, and polishing frontend UI.
+Site: <https://impeccable.style> · Repo: <https://github.com/pbakaus/impeccable>
+
+```bash
+npx skills add pbakaus/impeccable
+```

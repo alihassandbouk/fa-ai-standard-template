@@ -107,14 +107,13 @@ Present the plan to the developer. Wait for them to confirm before anything else
 
 ## Step 6 — Write the ADRs
 
-After the developer confirms the plan, the decisions become records. This is what Gate B approves — the plan is ephemeral; the ADRs are the artifact.
+After the developer confirms the plan, the decisions become records. The plan is ephemeral; the ADRs are the artifact.
 
 For each entry in "Decisions made" that has lasting consequences (the six-month "why?" test), draft an ADR in `docs/adr/`, numbered after the highest existing one, in this exact format:
 
 ```markdown
 # ADR-0XX: [Decision as a short imperative title]
 
-Status: Proposed
 Date: [date]
 Relates to: HLR-0XX [requirement IDs this decision serves], [ADR-0YY if it supersedes or builds on one]
 
@@ -134,24 +133,11 @@ the follow-up work implied. Honest, not promotional.]
 
 Rules:
 
-- Status starts at **Proposed**. It becomes **Accepted** when the tech lead approves at Gate B — that approval is recorded by editing the status line only, nothing else.
+
 - **Never edit an accepted ADR.** A changed decision is a new ADR with `Supersedes: ADR-0XX` in its header, and the old one gets `Superseded by: ADR-0YY` added to its status — the only edit an accepted ADR ever receives.
 - Not every decision is an ADR. "We'll name the module `feedback`" is a plan detail. "Outbox table over direct publish" is an ADR. When unsure, ask the developer.
 - Never put secrets in an ADR.
 
-Then confirm:
-
-```
-Blueprint confirmed. Drafted [N] ADRs:
-
-- ADR-006: [title] (Proposed)
-- ADR-007: [title] (Proposed)
-
-These are the Gate B package. Get them approved before building starts —
-approval flips each status to Accepted.
-```
-
-Only after the ADRs exist does this session end. Implementation begins in a build session, after Gate B approval — not here.
 
 ## What This Session Is Not
 
