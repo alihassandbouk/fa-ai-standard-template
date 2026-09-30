@@ -1,0 +1,545 @@
+#!/usr/bin/env python3
+"""
+diary — a single, global, append-only work journal for Claude Code sessions.
+
+Storage:  ~/.claude/diary/YYYY/MM/YYYY-MM-DD.<machine>.md
+                                           (one file per day PER MACHINE, so
+                                            two machines sharing a git remote
+                                            never touch the same file)
+State:    ~/.claude/diary/.state/                 (per-session bookkeeping)
+
+Plain markdown on purpose: readable without this tool, greppable, diffable,
+git-friendly, and impossible to corrupt in a way that loses your history.
+This script is stdlib-only — no pip installs, no database to migrate.
+
+Usage:
+  diary log --type decision --title "Chose X over Y" [--project P] [--tags a,b]
+  diary log ... --body -            # read body from stdin
+  diary search "postgres" --since 14d --type decision
+  diary show 2026-08-20
+  diary recent 5
+  diary days --since 30d
+  diary path
+  diary hook-stop                   # internal: called by the Claude Code Stop hook
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+from datetime import datetime, timedelta, date
+
+# --------------------------------------------------------------------------
+# Paths
+# --------------------------------------------------------------------------
+
+def diary_root() -> str:
+    env = os.environ.get("CLAUDE_DIARY_DIR")
+    if env:
+        return os.path.expanduser(env)
+    return os.path.join(os.path.expanduser("~"), ".claude", "diary")
+
+
+def state_dir() -> str:
+    d = os.path.join(diary_root(), ".state")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def machine_name() -> str:
+    """Short, filesystem-safe name for this machine.
+
+    Each machine writes its own day file, so two machines syncing through the
+    same git repo can never touch the same file and never conflict.
+    """
+    env = os.environ.get("CLAUDE_DIARY_MACHINE")
+    if not env:
+        override = os.path.join(diary_root(), ".machine")
+        if os.path.exists(override):
+            env = open(override, encoding="utf-8").read().strip()
+    if not env:
+        import socket
+        env = socket.gethostname().split(".")[0]
+    safe = re.sub(r"[^A-Za-z0-9_-]+", "-", env).strip("-").lower()
+    return safe or "unknown"
+
+
+def day_path(d: date, machine: str = None) -> str:
+    m = machine or machine_name()
+    return os.path.join(diary_root(), f"{d.year:04d}", f"{d.month:02d}",
+                        f"{d.isoformat()}.{m}.md")
+
+
+# --------------------------------------------------------------------------
+# Entry model
+# --------------------------------------------------------------------------
+
+VALID_TYPES = ["session", "decision", "research", "bug", "note", "todo"]
+
+META_RE = re.compile(r"^<!--\s*meta:\s*(.*?)\s*-->\s*$")
+FNAME_RE = re.compile(r"(\d{4}-\d{2}-\d{2})(?:\.([A-Za-z0-9_-]+))?\.md")
+HEAD_RE = re.compile(r"^##\s+(\d{2}:\d{2})\s+·\s+(\S+)\s*(?:·\s*(.*?))?\s*$")
+
+
+class Entry:
+    def __init__(self, day, time_s, etype, project, title, tags, body,
+                 session=None, cwd=None, path=None, machine=None):
+        self.day = day
+        self.time = time_s
+        self.type = etype
+        self.project = project or ""
+        self.title = title
+        self.tags = tags or []
+        self.body = body.rstrip()
+        self.session = session or ""
+        self.cwd = cwd or ""
+        self.machine = machine or ""
+        self.path = path
+
+    def render(self) -> str:
+        meta = [f"type={self.type}"]
+        if self.project:
+            meta.append(f"project={self.project}")
+        if self.tags:
+            meta.append("tags=" + ",".join(self.tags))
+        if self.session:
+            meta.append(f"session={self.session}")
+        if self.machine:
+            meta.append(f"machine={self.machine}")
+        if self.cwd:
+            meta.append(f"cwd={self.cwd}")
+        head = f"## {self.time} · {self.type}"
+        if self.project:
+            head += f" · {self.project}"
+        out = [head, "<!-- meta: " + " ".join(meta) + " -->", "",
+               f"**{self.title}**"]
+        if self.body:
+            out += ["", self.body]
+        return "\n".join(out) + "\n"
+
+    def stamp(self) -> str:
+        return f"{self.day.isoformat()} {self.time}"
+
+
+def split_filename(path):
+    """(date, machine) from a day filename, or (None, None)."""
+    m = FNAME_RE.fullmatch(os.path.basename(path))
+    if not m:
+        return None, None
+    try:
+        return date.fromisoformat(m.group(1)), (m.group(2) or "")
+    except ValueError:
+        return None, None
+
+
+def parse_meta(line: str) -> dict:
+    m = META_RE.match(line)
+    if not m:
+        return {}
+    out = {}
+    # cwd may contain spaces only if quoted; we write it unquoted and tolerate it
+    for part in m.group(1).split(" "):
+        if "=" in part:
+            k, v = part.split("=", 1)
+            out[k] = v
+    return out
+
+
+def parse_file(path: str):
+    """Yield Entry objects from one day file."""
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+    except OSError:
+        return
+    day, fmachine = split_filename(path)
+    if day is None:
+        return
+
+    i = 0
+    n = len(lines)
+    while i < n:
+        h = HEAD_RE.match(lines[i])
+        if not h:
+            i += 1
+            continue
+        time_s, etype, project = h.group(1), h.group(2), (h.group(3) or "")
+        meta = {}
+        j = i + 1
+        if j < n and META_RE.match(lines[j]):
+            meta = parse_meta(lines[j])
+            j += 1
+        block = []
+        while j < n and not HEAD_RE.match(lines[j]):
+            block.append(lines[j])
+            j += 1
+        # first non-empty bold line is the title
+        title, rest = "", []
+        for k, ln in enumerate(block):
+            if ln.strip():
+                title = ln.strip().strip("*")
+                rest = block[k + 1:]
+                break
+        tags = [t for t in meta.get("tags", "").split(",") if t]
+        yield Entry(day, time_s, meta.get("type", etype),
+                    meta.get("project", project), title, tags,
+                    "\n".join(rest).strip(), meta.get("session"),
+                    meta.get("cwd"), path,
+                    meta.get("machine") or fmachine)
+        i = j
+
+
+def all_files():
+    root = diary_root()
+    hits = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+        for f in filenames:
+            if FNAME_RE.fullmatch(f):
+                hits.append(os.path.join(dirpath, f))
+    return sorted(hits)
+
+
+def load_entries(since=None, until=None):
+    for path in all_files():
+        d, _ = split_filename(path)
+        if d is None:
+            continue
+        if since and d < since:
+            continue
+        if until and d > until:
+            continue
+        for e in parse_file(path):
+            yield e
+
+
+# --------------------------------------------------------------------------
+# Date helpers
+# --------------------------------------------------------------------------
+
+def parse_when(s):
+    """Accept 2026-08-20, 'today', 'yesterday', '10d', '3w', '6m'."""
+    if not s:
+        return None
+    s = s.strip().lower()
+    today = date.today()
+    if s == "today":
+        return today
+    if s == "yesterday":
+        return today - timedelta(days=1)
+    m = re.fullmatch(r"(\d+)\s*([dwmy])", s)
+    if m:
+        n = int(m.group(1))
+        mult = {"d": 1, "w": 7, "m": 30, "y": 365}[m.group(2)]
+        return today - timedelta(days=n * mult)
+    try:
+        return date.fromisoformat(s)
+    except ValueError:
+        sys.exit(f"diary: cannot parse date '{s}' "
+                 f"(use YYYY-MM-DD, today, yesterday, 10d, 3w, 6m)")
+
+
+# --------------------------------------------------------------------------
+# Commands
+# --------------------------------------------------------------------------
+
+def cmd_log(a):
+    now = datetime.now()
+    d = parse_when(a.date) if a.date else now.date()
+    time_s = a.time or now.strftime("%H:%M")
+
+    body = a.body or ""
+    if body == "-":
+        body = sys.stdin.read()
+
+    tags = [t.strip().lstrip("#") for t in (a.tags or "").split(",") if t.strip()]
+    project = a.project or os.environ.get("CLAUDE_DIARY_PROJECT") or ""
+    cwd = a.cwd or os.getcwd()
+    if not project and cwd:
+        project = os.path.basename(cwd.rstrip("/")) or ""
+
+    entry = Entry(d, time_s, a.type, project, a.title.strip(), tags, body,
+                  a.session or os.environ.get("CLAUDE_SESSION_ID", ""), cwd,
+                  machine=a.machine or machine_name())
+
+    path = day_path(d, entry.machine)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    new = not os.path.exists(path)
+    with open(path, "a", encoding="utf-8") as fh:
+        if new:
+            fh.write(f"# {d.isoformat()} — {d.strftime('%A')} "
+                     f"({entry.machine})\n\n")
+        else:
+            fh.write("\n")
+        fh.write(entry.render())
+
+    if entry.session:
+        with open(os.path.join(state_dir(), f"s-{entry.session}.logged"),
+                  "w", encoding="utf-8") as fh:
+            fh.write(now.isoformat())
+
+    print(f"logged: {entry.stamp()} [{entry.type}] {entry.title}")
+    print(f"  -> {path}")
+
+
+def match(e, needles, etype, project, tag, invert_and=True, machine=""):
+    hay = " ".join([e.title, e.body, e.project, " ".join(e.tags), e.type]).lower()
+    if needles:
+        ok = all(n in hay for n in needles) if invert_and else any(n in hay for n in needles)
+        if not ok:
+            return False
+    if etype and e.type != etype:
+        return False
+    if project and project.lower() not in e.project.lower():
+        return False
+    if tag and tag.lstrip("#").lower() not in [t.lower() for t in e.tags]:
+        return False
+    if machine and machine.lower() not in e.machine.lower():
+        return False
+    return True
+
+
+def print_entry(e, full=True, highlight=None):
+    head = f"\033[1m{e.stamp()}\033[0m  [{e.type}]"
+    if e.project:
+        head += f"  {e.project}"
+    if e.machine and e.machine != machine_name():
+        head += f"  @{e.machine}"
+    if e.tags:
+        head += "  " + " ".join("#" + t for t in e.tags)
+    print(head)
+    print(f"  {e.title}")
+    if full and e.body:
+        for ln in e.body.splitlines():
+            print(f"  {ln}")
+    print(f"  \033[2m{e.path}\033[0m")
+    print()
+
+
+def cmd_search(a):
+    since = parse_when(a.since)
+    until = parse_when(a.until)
+    needles = [q.lower() for q in a.query]
+    results = [e for e in load_entries(since, until)
+               if match(e, needles, a.type, a.project, a.tag, not a.any,
+                        a.machine)]
+    results.sort(key=lambda e: (e.day, e.time), reverse=not a.oldest_first)
+    if a.limit:
+        results = results[:a.limit]
+    if a.json:
+        print(json.dumps([{
+            "date": e.day.isoformat(), "time": e.time, "type": e.type,
+            "project": e.project, "machine": e.machine,
+            "tags": e.tags, "title": e.title,
+            "body": e.body, "file": e.path} for e in results], indent=2))
+        return
+    if not results:
+        print("no matching entries")
+        return
+    for e in results:
+        print_entry(e, full=not a.compact)
+    print(f"{len(results)} entr{'y' if len(results)==1 else 'ies'}")
+
+
+def cmd_show(a):
+    d = parse_when(a.date)
+    found = [p for p in all_files() if split_filename(p)[0] == d]
+    if not found:
+        print(f"no diary file for {d.isoformat()}")
+        return
+    for i, path in enumerate(found):
+        if i:
+            print()
+        with open(path, encoding="utf-8") as fh:
+            sys.stdout.write(fh.read())
+
+
+def cmd_recent(a):
+    entries = sorted(load_entries(), key=lambda e: (e.day, e.time), reverse=True)
+    for e in entries[:a.n]:
+        print_entry(e, full=not a.compact)
+
+
+def cmd_days(a):
+    since = parse_when(a.since)
+    counts = {}
+    for e in load_entries(since, None):
+        counts.setdefault(e.day, []).append(e)
+    for d in sorted(counts, reverse=True):
+        es = counts[d]
+        kinds = ", ".join(sorted({e.type for e in es}))
+        machines = ", ".join(sorted({e.machine for e in es if e.machine}))
+        word = "entry" if len(es) == 1 else "entries"
+        line = f"{d.isoformat()}  {len(es):>2} {word:<7} ({kinds})"
+        if machines:
+            line += f"  @{machines}"
+        print(line)
+
+
+def cmd_path(a):
+    print(diary_root())
+
+
+GITATTRS = "*.md merge=union\n"
+
+
+def _git(args, check=True, quiet=False):
+    import subprocess
+    r = subprocess.run(["git", "-C", diary_root()] + args,
+                       capture_output=True, text=True)
+    if check and r.returncode != 0:
+        sys.stderr.write(r.stderr or r.stdout)
+        sys.exit(f"diary: git {' '.join(args)} failed")
+    if not quiet and r.stdout.strip():
+        print(r.stdout.strip())
+    return r
+
+
+def cmd_sync(a):
+    """Commit local entries and exchange them with the shared remote.
+
+    Each machine writes its own day files, so the two sides never edit the
+    same file and a plain pull --rebase merges cleanly.
+    """
+    root = diary_root()
+    os.makedirs(root, exist_ok=True)
+
+    if not os.path.isdir(os.path.join(root, ".git")):
+        if not a.remote:
+            sys.exit("diary: not a git repo yet — run:\n"
+                     "  diary sync --remote git@github.com:<you>/<private-repo>.git")
+        _git(["init", "-q", "-b", "main"])
+        with open(os.path.join(root, ".gitattributes"), "w") as fh:
+            fh.write(GITATTRS)
+        with open(os.path.join(root, ".gitignore"), "w") as fh:
+            fh.write(".state/\n.machine\n")
+        _git(["remote", "add", "origin", a.remote])
+        print(f"initialised diary repo -> {a.remote}")
+    elif a.remote:
+        _git(["remote", "set-url", "origin", a.remote])
+        print(f"remote set to {a.remote}")
+
+    _git(["add", "-A"], quiet=True)
+    staged = _git(["diff", "--cached", "--name-only"], quiet=True).stdout.strip()
+    if staged:
+        msg = a.message or f"diary: {machine_name()} {datetime.now():%Y-%m-%d %H:%M}"
+        _git(["commit", "-q", "-m", msg], quiet=True)
+        print(f"committed {len(staged.splitlines())} file(s)")
+    else:
+        print("nothing new to commit")
+
+    # a dedicated diary repo always lives on main, whatever git defaulted to
+    if _git(["rev-parse", "--verify", "-q", "HEAD"],
+            check=False, quiet=True).returncode == 0:
+        _git(["branch", "-M", "main"], check=False, quiet=True)
+
+    if a.no_push:
+        return
+    fetch = _git(["fetch", "origin"], check=False, quiet=True)
+    if fetch.returncode != 0:
+        sys.stderr.write(fetch.stderr)
+        sys.exit("diary: could not reach the remote — entries are committed locally")
+    if _git(["rev-parse", "--verify", "-q", "origin/main"],
+            check=False, quiet=True).returncode == 0:
+        _git(["pull", "--rebase", "origin", "main"], quiet=True)
+    _git(["push", "-u", "origin", "main"], quiet=True)
+    print("synced with origin/main")
+
+
+def cmd_hook_stop(a):
+    """Claude Code Stop hook: nudge once if this session logged nothing."""
+    try:
+        payload = json.load(sys.stdin)
+    except Exception:
+        sys.exit(0)
+    if payload.get("stop_hook_active"):
+        sys.exit(0)
+    sid = payload.get("session_id") or ""
+    if not sid:
+        sys.exit(0)
+    st = state_dir()
+    if os.path.exists(os.path.join(st, f"s-{sid}.logged")):
+        sys.exit(0)
+    nudged = os.path.join(st, f"s-{sid}.nudged")
+    if os.path.exists(nudged):
+        sys.exit(0)
+    with open(nudged, "w") as fh:
+        fh.write(datetime.now().isoformat())
+    sys.stderr.write(
+        "Nothing was written to the diary this session. Before finishing, "
+        "append a session entry with the `diary` skill:\n"
+        f"  diary log --type session --session {sid} --title \"<one line>\" "
+        "--body - <<'EOF'\n  ...what happened, what was decided, what's next...\n  EOF\n"
+        "If the session was trivial (a single question, no work done), reply "
+        "that no entry is needed and stop.\n")
+    sys.exit(2)
+
+
+# --------------------------------------------------------------------------
+
+def main():
+    p = argparse.ArgumentParser(prog="diary", description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    lg = sub.add_parser("log", help="append an entry")
+    lg.add_argument("--type", default="note", choices=VALID_TYPES)
+    lg.add_argument("--title", required=True)
+    lg.add_argument("--body", default="", help="body text, or '-' for stdin")
+    lg.add_argument("--project", default="")
+    lg.add_argument("--tags", default="", help="comma separated")
+    lg.add_argument("--session", default="")
+    lg.add_argument("--machine", default="")
+    lg.add_argument("--cwd", default="")
+    lg.add_argument("--date", default="", help="backdate an entry (YYYY-MM-DD)")
+    lg.add_argument("--time", default="", help="HH:MM")
+    lg.set_defaults(func=cmd_log)
+
+    se = sub.add_parser("search", help="full-text search across all entries")
+    se.add_argument("query", nargs="*")
+    se.add_argument("--since", default="")
+    se.add_argument("--until", default="")
+    se.add_argument("--type", default="", choices=[""] + VALID_TYPES)
+    se.add_argument("--project", default="")
+    se.add_argument("--tag", default="")
+    se.add_argument("--machine", default="", help="only entries from a machine")
+    se.add_argument("--limit", type=int, default=0)
+    se.add_argument("--compact", action="store_true", help="titles only")
+    se.add_argument("--any", action="store_true", help="OR the terms (default AND)")
+    se.add_argument("--oldest-first", action="store_true")
+    se.add_argument("--json", action="store_true")
+    se.set_defaults(func=cmd_search)
+
+    sh = sub.add_parser("show", help="print one day's file")
+    sh.add_argument("date")
+    sh.set_defaults(func=cmd_show)
+
+    rc = sub.add_parser("recent", help="most recent entries")
+    rc.add_argument("n", nargs="?", type=int, default=10)
+    rc.add_argument("--compact", action="store_true")
+    rc.set_defaults(func=cmd_recent)
+
+    dy = sub.add_parser("days", help="list days that have entries")
+    dy.add_argument("--since", default="")
+    dy.set_defaults(func=cmd_days)
+
+    pa = sub.add_parser("path", help="print the diary root")
+    pa.set_defaults(func=cmd_path)
+
+    sy = sub.add_parser("sync", help="share the diary between machines via git")
+    sy.add_argument("--remote", default="",
+                    help="git URL of a PRIVATE repo (first run only)")
+    sy.add_argument("--message", default="")
+    sy.add_argument("--no-push", action="store_true", help="commit only")
+    sy.set_defaults(func=cmd_sync)
+
+    hk = sub.add_parser("hook-stop", help="internal: Stop hook handler")
+    hk.set_defaults(func=cmd_hook_stop)
+
+    a = p.parse_args()
+    a.func(a)
+
+
+if __name__ == "__main__":
+    main()

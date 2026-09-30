@@ -1,0 +1,19 @@
+{
+  "name": "fa",
+  "version": "1.0.0",
+  "description": "FA AI Development Standard: the process skills (architect, review, recover, remember, imprint, audit, sync), the repo scaffold (init), and the TFA .NET skills (development guard, FAST Core integration).",
+  "author": {
+    "name": "FA",
+    "url": "https://github.com/alihassandbouk/fa-ai-standard-template"
+  },
+  "repository": "https://github.com/alihassandbouk/fa-ai-standard-template",
+  "keywords": [
+    "fa",
+    "standard",
+    "adr",
+    "clean-architecture",
+    "dotnet",
+    "fast-core"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

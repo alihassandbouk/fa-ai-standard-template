@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "fa-ai",
+  "description": "FA AI Development Standard plugins.",
+  "owner": {
+    "name": "FA",
+    "url": "https://github.com/alihassandbouk/fa-ai-standard-template"
+  },
+  "plugins": [
+    {
+      "name": "fa",
+      "description": "FA AI Development Standard: process skills, repo scaffold, and TFA .NET skills.",
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}

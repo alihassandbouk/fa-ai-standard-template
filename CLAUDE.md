@@ -1,23 +1,16 @@
 # CLAUDE.md
 
-**Function:** The entry point for any AI agent working in this repo. States the
-non-negotiable rules and the three pipeline gates. This file should rarely
-change — it describes the *process*, not the project.
+This repo is the **FA AI Development Standard** packaged as a Claude Code
+plugin (`fa`) plus the scaffold it installs into projects.
 
----
+- `skills/<name>/SKILL.md` — the skills. Only the frontmatter `description`
+  is loaded every session; keep it under ~3 lines and put detail in the body
+  or in `references/`.
+- `template/` — what `/fa:init` copies into a project. `template/CLAUDE.md`
+  is the process file every project gets; it should rarely change.
+- `.claude-plugin/plugin.json` — bump `version` on every release; installed
+  copies only update when that string changes.
 
-## Non-negotiables
-
-- No ticket without a requirement ID.
-- Never edit an accepted ADR — supersede it.
-- Changing a requirement means changing its tests.
-- Reference files (`context/*.md`) are rewritten to reflect the current
-  state, never appended with "previously X, now Y."
-- Diary entries and ADRs are append-only once written.
-- No PII in logs.
-
-
-
-
-
--  Read All the context files AGENT.md files across the Repo
+Test locally with `claude --plugin-dir .` and `claude plugin validate .`.
+Skill bodies are read on invoke only, so a skill that must be honoured every
+session belongs in `template/CLAUDE.md`, not in a skill.
