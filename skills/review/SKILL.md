@@ -53,6 +53,7 @@ Check:
 - **Design system** — are the correct tokens, classes, and patterns used? Any hardcoded values that should be variables? Any raw color classes that should use the design system?
 - **Code standards** — naming conventions, file organisation, TypeScript strictness, error handling patterns — do they match what the project established?
 - **Existing patterns** — does this feature introduce a new pattern when an existing one should have been used?
+- **.NET repos** — also run the Review Checklist and the skinny-controller validation procedure from `/fa:tfa-development-guard`, and report its "Skinny controller check" block.
 
 ### Layer 3 — Is it production ready?
 

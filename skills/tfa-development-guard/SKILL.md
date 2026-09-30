@@ -57,8 +57,9 @@ Do these steps in order. Use `Product` in the reference files as the template:
     dotnet ef database update --project src/{Solution}.Infrastructure --startup-project src/{Solution}.Api
     ```
     Review the generated migration before applying it. Never edit a migration that has already been applied to a shared database. Add a new one instead.
-11. **Tests**: write service unit tests (mock the repositories and `IUnitOfWork`) and repository integration tests.
-12. **Checklist**: run the [pre-deployment checklist](#pre-deployment-checklist) and report its status.
+11. **Diagram**: if the change added or altered an entity, relationship or table, regenerate `docs/schema.d2` with `/fa:efcore-d2-db-diagram`.
+12. **Tests**: write service unit tests (mock the repositories and `IUnitOfWork`) and repository integration tests.
+13. **Checklist**: run the [pre-deployment checklist](#pre-deployment-checklist) and report its status.
 
 For a **database view** (read-only), follow the same order using [references/read-only-views.md](references/read-only-views.md). The steps are: read model, `I{View}Repository : IReadOnlyRepository<T>`, `ToView` configuration, a `DbSet` on `ReadOnlyDbContext`, repository, DTO, service with auditing, DI, then a GET-only controller. There is no migration step unless the app owns the view's DDL.
 

@@ -21,6 +21,7 @@ describing the past misleads every later session.
    - a convention the change introduces or breaks → `context/code-standards.md`
    - a new external system → `context/integrations/<name>.md`
    - UI → `context/ui-rules.md` and `context/ui-patterns.md`
+   - EF Core entities, configurations or migrations → `docs/schema.d2` is stale: flag "regenerate with `/fa:efcore-d2-db-diagram`"
 3. **Edit surgically.** Rewrite the one line that is now false; add the one
    line that is now missing. Never append "previously X, now Y". Never rewrite
    a paragraph. A brand-new area with real conventions gets an `AGENTS.md` in

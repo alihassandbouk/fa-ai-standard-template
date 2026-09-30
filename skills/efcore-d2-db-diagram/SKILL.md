@@ -251,22 +251,9 @@ Before delivering the diagram, verify:
 
 ## Output Format
 
-When the user asks for a skill installation, provide this folder structure:
-
-```text
-.github/
-  skills/
-    efcore-d2-db-diagram/
-      SKILL.md
-      references/
-        efcore-model-extraction.md
-        d2-erd-style.md
-        relationship-rules.md
-        grouping-modes.md
-        quality-gate.md
-```
-
-When the user asks to generate a diagram, provide:
+Write the diagram to `docs/schema.d2` (and `docs/schema.svg` when `d2` is
+installed) unless the user names another path; `context/architecture.md`
+links to it under *Data & domain model*. Then provide:
 
 1. The `.d2` source file content.
 2. The render command using the selected layout engine.
