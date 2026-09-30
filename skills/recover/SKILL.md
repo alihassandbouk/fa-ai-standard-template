@@ -176,7 +176,7 @@ Next steps:
 1. Save this reset note somewhere accessible
 2. End this session completely
 3. Start a fresh session
-4. Begin with /remember restore if memory exists
+4. Begin with /fa:remember restore if memory exists
 5. Approach [feature name] again with the reset note as context
 
 Do not continue in this session.

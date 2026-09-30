@@ -1,7 +1,7 @@
 ---
 name: audit
-description: Fill the project's AI context from the codebase — the context/*.md reference files CLAUDE.md imports every session, plus a nested AGENTS.md for each area with its own conventions. Run /audit on a repo whose context files still have _TODO_ sections, after a change that made them stale, or on one area (/audit src/auth). Adds only what is missing; never overwrites what a human wrote.
-allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Agent
+description: Fill the project's AI context from the codebase — the context/*.md reference files CLAUDE.md imports every session, plus a nested AGENTS.md for each area with its own conventions. Run /fa:audit on a repo whose context files still have _TODO_ sections, after a change that made them stale, or on one area (/fa:audit src/auth). Adds only what is missing; never overwrites what a human wrote.
+allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Agent, AskUserQuestion
 ---
 
 # audit — bootstrap the AI context
@@ -14,7 +14,8 @@ code as it is. No history, no plans.
 
 | Target | Content | Rule |
 |---|---|---|
-| `context/project-overview.md` | what it is, problem, pages, roles, stakeholders | replace `_TODO_` only |
+| `context/project-overview.md` | what it is, problem, pages, roles, features by page | replace `_TODO_` only |
+| `context/project-overview.md`, `context/code-standards.md` | target user, stakeholders, source documents, engineering mindset | the code cannot answer these: ask the developer, one question per heading, then write the answer |
 | `context/architecture.md` | stack, folder structure, boundaries, data model, deployment | replace `_TODO_` only |
 | `context/code-standards.md` | conventions observed in the code: naming, tests, errors, logging | replace `_TODO_` only |
 | `context/code-standards.md`, `## .NET standard` | the TFA rules from `${CLAUDE_PLUGIN_ROOT}/skills/tfa-development-guard/references/standards.md` | append if the repo is .NET and the heading is missing |
@@ -54,11 +55,12 @@ list it under **Contradictions** in the report and leave the file alone.
    - ...
    ```
 
-4. **Report:** what was written, what was skipped because it was curated,
-   contradictions, and the `_TODO_`s that need a human because the code cannot
-   answer them (stakeholders, source documents).
+4. **Ask** the developer for each remaining `_TODO_` the code cannot answer and
+   write the answers. A `_TODO_` the developer defers stays as it is.
+5. **Report:** what was written, what was skipped because it was curated,
+   contradictions, and the `_TODO_`s still open.
 
 ## Not this skill
 
-Specs and tickets (`/fa:grill-with-docs` reads them), ADRs (it writes them), upkeep after a change (`/fa:sync`). A repo with no `context/` at all
+Tickets (`/fa:grill-with-docs` reads them), ADRs (it writes them), upkeep after a change (`/fa:sync`). A repo with no `context/` at all
 needs `/fa:init` first.

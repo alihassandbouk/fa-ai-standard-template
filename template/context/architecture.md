@@ -13,8 +13,11 @@ _TODO: languages, frameworks, key libraries._
 
 ## Folder Structure
 
+_TODO: top-level folders and what each owns; nested `AGENTS.md` files are listed here._
+
 ## System Boundaries
 
+_TODO: external systems this talks to, and how (auth, protocol, settings keys)._
 
 ## System overview
 

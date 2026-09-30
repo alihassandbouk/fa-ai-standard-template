@@ -42,6 +42,7 @@ Check:
 - Every part of the feature description — is it all there?
 - The decisions made during planning — are they reflected in the code?
 - The scope — did the implementation stay within bounds or add things that were not asked for?
+- The tests — one at every seam the plan names and none elsewhere, and none of the three shapes `/fa:implement` bans (implementation-coupled, tautological, horizontal)
 
 Flag anything that was planned but missing. Flag anything that was built but not planned.
 
@@ -78,7 +79,7 @@ After completing all three layers, produce a clear report. Do not bury issues. D
 
 ### Layer 1 — Plan alignment
 [PASS / ISSUES FOUND]
-[List any gaps between what was planned and what was built]
+[List any gaps between what was planned and what was built, including untested seams and banned test shapes]
 
 ### Layer 2 — System integrity
 [PASS / ISSUES FOUND]

@@ -209,7 +209,7 @@ entries.
 .claude-plugin/   plugin.json (name, version) and marketplace.json (source ./)
 .mcp.json         Atlassian and Notion remote servers
 skills/           one folder per skill, SKILL.md plus references/
-hooks/            hooks.json, session-start.sh, stop.sh
+hooks/            hooks.json, session-start.sh, stop.sh, git-guardrails.sh
 scripts/diary     personal diary CLI
 template/         what /fa:init copies into a project:
                     CLAUDE.md, context/ (incl. glossary), docs/adr/, diary/repo/, .gitignore

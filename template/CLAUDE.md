@@ -22,9 +22,8 @@ Before touching an area, also read that area's `AGENTS.md` if one exists
 
 ## Non-negotiables
 
-- No ticket without a requirement ID.
-- Never edit an accepted ADR — supersede it.
-- Changing a requirement means changing its tests.
+- Never edit an ADR — supersede it.
+- Changing what a ticket asks for means changing its tests.
 - Reference files (`context/*.md`, `AGENTS.md`) are rewritten to reflect the
   current state, never appended with "previously X, now Y."
 - Diary entries and ADRs are append-only once written.

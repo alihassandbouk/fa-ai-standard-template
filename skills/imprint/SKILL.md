@@ -18,19 +18,19 @@ One command. Run it every time. That is the whole system.
 After building any UI, run:
 
 ```
-/imprint
+/fa:imprint
 ```
 
 To target a specific file:
 
 ```
-/imprint [filepath]
+/fa:imprint [filepath]
 ```
 
 To audit the existing product UI for pattern conflicts:
 
 ```
-/imprint audit
+/fa:imprint audit
 ```
 
 If no filepath is given, identify the screen or component files created or modified in this session and work from those. If it is unclear, ask.
@@ -106,7 +106,7 @@ Imprinted [screen] → context/ui-patterns.md
 
 ---
 
-## Audit Mode — /imprint audit
+## Audit Mode — /fa:imprint audit
 
 Run when product UI already exists and pattern consistency is uncertain, or before establishing `context/ui-patterns.md` for the first time.
 
@@ -129,7 +129,7 @@ Capture without consumption is a write-only file. The loop is: read the patterns
 
 ## The Rule
 
-Build a screen. Run `/imprint`. Move on.
+Build a screen. Run `/fa:imprint`. Move on.
 
 The design system makes components consistent. This skill makes **screens** consistent. A registry of ten patterns answers the question every future session starts with: "how do we build this kind of page here?"
 

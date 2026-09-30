@@ -1,8 +1,8 @@
 # ADR-0000: <Decision Title>
 
-**Status:** Proposed | Accepted | Superseded by ADR-XXXX
+**Status:** Accepted | Superseded by ADR-XXXX
 **Date:** YYYY-MM-DD
-**Requirement(s) affected:** HLR-XXX (if applicable)
+**Ticket:** KEY-123 (if applicable)
 
 ## Decision
 
@@ -15,6 +15,4 @@ and why._
 
 ## Consequences
 
-_What this makes easier, harder, or requires elsewhere in the project.
-Note explicitly if this deviates from a Must-have requirement, and how that
-deviation was flagged for review._
+_What this makes easier, harder, or requires elsewhere in the project._

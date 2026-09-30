@@ -22,5 +22,6 @@ _TODO: conventions, structured logging, no-PII-in-logs enforcement._
 _TODO: PR expectations, what agent self-review must check before human
 review._
 
-
 ## Engineering mindset
+
+_TODO: the attitudes the team expects in code, e.g. boring over clever, delete before adding._

@@ -1,6 +1,6 @@
 ---
 name: sync
-description: Keep the AI context true after a change lands. Diffs the branch against main, rewrites the lines in context/*.md and the touched areas' AGENTS.md that the change made false, and flags decisions with no ADR and changed requirements whose tests did not change. Run /sync as the last step before merge, after /review.
+description: Keep the AI context true after a change lands. Diffs the branch against main, rewrites the lines in context/*.md and the touched areas' AGENTS.md that the change made false, and flags decisions with no ADR and tickets whose ask changed while their tests did not. Run /fa:sync as the last step before merge, after /fa:review.
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 ---
 
@@ -30,8 +30,8 @@ describing the past misleads every later session.
    - a decision that is hard to reverse, surprising without context, and the
      result of a real trade-off, with no ADR in `docs/adr/` → *needs ADR, run
      `/fa:grill-with-docs`*
-   - a requirement (ticket or spec named in the diff or commits) that changed
-     while its tests did not → *non-negotiable violation*
+   - a ticket (named in the diff or commits) whose ask changed while its tests
+     did not → *non-negotiable violation*
    - curated prose the code now contradicts → list it, leave it
 5. **Report:** edited (`file:line`), created, flagged. Then remind the
    developer to run `/fa:remember save`.

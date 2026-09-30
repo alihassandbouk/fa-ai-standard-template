@@ -15,7 +15,7 @@ session finds them. Then produce the plan `/fa:implement` builds from.
 
 ## Before the first question
 
-Read, do not ask about: the requirement (the Jira story or the spec file),
+Read, do not ask about: the Jira story,
 `context/glossary.md`, `docs/adr/`, and the `AGENTS.md` of the areas the
 feature touches. Never write to Jira. Anything already answered there is not
 a question.
@@ -59,7 +59,8 @@ Done when the frontier is empty and nothing is silently assumed. Say
 - **Offer an ADR only when all three hold:** hard to reverse, surprising
   without context, the result of a real trade-off. Otherwise it is a plan
   detail. Write it in `docs/adr/`, numbered after the highest, in the
-  template there, status Proposed. Never edit an accepted ADR; supersede it.
+  template there. The developer's answer is the acceptance, so the status is
+  Accepted from the start. Never edit an ADR; supersede it.
 
 ## The plan
 
@@ -72,8 +73,8 @@ glossary and ADRs are the artifacts):
 ### What we are building
 <one paragraph>
 
-### Requirements covered
-- <ticket keys or requirement IDs; name any Must not covered and why>
+### Tickets covered
+- <ticket keys; name anything in the ticket not covered and why>
 
 ### Decisions
 - <decision → reasoning → rejected; ADR-00X where one was written>
@@ -90,5 +91,5 @@ Then: `Run /fa:implement to build this.`
 ## What this is not
 
 Not an interrogation to prove the developer wrong. Not a spec session, the
-requirement exists. Not endless: ask what changes the build, settle it, write
+ticket exists. Not endless: ask what changes the build, settle it, write
 it down, hand off.

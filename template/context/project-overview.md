@@ -17,13 +17,19 @@ this project ships._
 
 ## Pages
 
+_TODO: every screen or route, one line each._
+
 ## Roles
 
-## Feature By page
+_TODO: who uses it and what each role may do._
+
+## Features by page
+
+_TODO: per page, what the user can do there._
 
 ## Target user
 
-
+_TODO: who this is built for, in one sentence._
 
 ## Stakeholders
 
@@ -31,5 +37,5 @@ _TODO: business owner, tech lead, key reviewers._
 
 ## Source documents
 
-_TODO: links to BRD, HLR, and any other business-authored source documents
-this project's specs are traced back to._
+_TODO: links to the BRD, HLR and any other business-authored documents behind
+this project._

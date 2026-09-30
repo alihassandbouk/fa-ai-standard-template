@@ -1,6 +1,6 @@
 ---
 name: remember
-description: Save what matters at the end of a session so the next session picks up exactly where you left off, or restore context at the start of a new session. Saves to the repo diary (diary/YYYY-MM-DD.md, committed) — append-only session history with the handoff built in. Personal or cross-repo learnings go to the global diary instead (see the diary skill).
+description: Save what matters at the end of a session so the next session picks up exactly where you left off, or restore context at the start of a new session. Saves to the repo diary (diary/repo/YYYY-MM-DD.<author>.md, committed) — append-only session history with the handoff built in. Personal or cross-repo learnings go to the global diary instead (see the diary skill).
 ---
 
 AI has no memory between sessions. Every new session starts blank. This skill fixes that.
@@ -17,10 +17,10 @@ If a detail is useful but sensitive, refer to it by name (`GHCR_PAT`, `DATABASE_
 
 ## How to Invoke
 
-**To save at end of session:** `/remember save`
-**To restore at start of new session:** `/remember restore`
+**To save at end of session:** `/fa:remember save`
+**To restore at start of new session:** `/fa:remember restore`
 
-If the developer runs `/remember` without specifying — ask which one they need.
+If the developer runs `/fa:remember` without specifying — ask which one they need.
 
 ---
 
@@ -32,7 +32,7 @@ Append an entry to `diary/repo/YYYY-MM-DD.<author>.md`, where `<author>` is `git
 
 This file is committed to git. Write for a teammate: terse, factual, no stream-of-consciousness.
 
-**Routing rule:** if what you learned is about the project, it goes here. If it is about the developer, this machine, or work spanning several repos, it goes to the **global diary** (`diary log ...` — see the diary skill) instead. Write once — never both.
+**Routing rule:** this entry is for teammates and stays about the project. The developer's **personal diary** (`diary log ...`, see the diary skill) gets its own session entry, written for someone with no access to this repo; decisions and non-obvious fixes go there as they happen, not at the end.
 
 ### What to capture
 
@@ -57,7 +57,7 @@ Only what a colleague — equally skilled, knowing nothing about today — would
 ```markdown
 ## HH:MM — [short session title]
 
-Tickets: RL-45 [API] · Requirements: HLR-046, HLR-047
+Tickets: RL-45
 
 ### What changed
 - ...
@@ -106,7 +106,7 @@ Run a final pass for secrets, then confirm:
 Session saved to diary/repo/YYYY-MM-DD.<author>.md.
 [Promoted: ADR-007 drafted / nothing promoted]
 
-Next session: run /remember restore to pick up from here.
+Next session: run /fa:remember restore to pick up from here.
 ```
 
 ---
@@ -120,7 +120,7 @@ Find the newest date among the files in `diary/repo/` and read the **last three 
 ```
 No diary entries found in this repo.
 Either this is the first session, or nothing was saved.
-To save at the end of a session, run /remember save.
+To save at the end of a session, run /fa:remember save.
 ```
 
 ### Step 2 — Read the essentials
@@ -151,7 +151,7 @@ Say so honestly, name what is missing, and let the developer decide whether to f
 
 ## The Rule
 
-Every session ends with `/remember save`.
-Every session starts with `/remember restore`.
+Every session ends with `/fa:remember save`.
+Every session starts with `/fa:remember restore`.
 Restore reads one entry. History is searched, never loaded.
 Durable facts get promoted; the diary keeps the story.
