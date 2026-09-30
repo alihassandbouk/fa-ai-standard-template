@@ -72,6 +72,7 @@ are offered the plugin when they trust the folder.
 | `/fa:diary` | The developer's personal diary, across all repos. Claude logs decisions and research as they happen. |
 | `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard. |
 | `/fa:tfa-integration-fast-core` | Integrating with FAST Core: REST, SSO, or DB views. |
+| `/fa:efcore-d2-db-diagram` | Generate a D2 entity-relationship diagram from EF Core models. |
 
 The scaffold a project receives:
 

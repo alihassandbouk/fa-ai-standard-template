@@ -126,7 +126,13 @@ The rules every .NET/C# project follows. `/fa:init` copies this page into `conte
 
 ## Code Quality
 
-- Follow SOLID principles.
-- Avoid duplication by using the base repository, mapping extensions and shared base classes.
-- Use names that reflect domain concepts.
-- Keep methods small, focused and cohesive.
+- Follow SOLID principles, and use names that reflect domain concepts.
+- **DRY (Don't Repeat Yourself)**: if the same logic appears twice, extract it into a reusable service, extension method or helper class. Also reuse the base repository, mapping extensions and shared base classes.
+- **Single Responsibility Principle**: each class and method does one thing and does it well. If a method has more than one responsibility, split it into focused, single-purpose methods.
+- **Skinny controllers, fat services**: controllers are thin orchestrators that delegate to application services. Business logic belongs in services (and domain entities), never in controllers. A controller action may only:
+  1. accept and validate input,
+  2. call service methods,
+  3. return the appropriate HTTP response.
+- **Early returns and guard clauses**: avoid deep nesting. Handle invalid arguments, error conditions and edge cases at the top of the method and return or throw immediately. The happy path stays unindented at the end.
+- **Small, focused functions**: keep methods under 20–25 lines where possible. When a method grows longer, extract well-named private helpers. Each method should be understandable at a glance.
+- **Modularity**: organize code into logical namespaces and project layers. Group related functionality by feature (`{Solution}.{Layer}.{Feature}`), following Clean Architecture (the layout above) or Vertical Slice Architecture where the project already uses it. Don't mix the two within one feature.
