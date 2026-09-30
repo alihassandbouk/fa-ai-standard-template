@@ -18,8 +18,7 @@ short; everything else is read on demand.
 @context/glossary.md
 
 Before touching an area, also read that area's `AGENTS.md` if one exists
-(`/fa:audit` writes them). `docs/adr/`, `diary/` and `context/integrations/`
-are read when the task needs them, not every session.
+(`/fa:audit` writes them). `docs/adr/` and `diary/` are read when the task needs them, not every session.
 
 ## Non-negotiables
 

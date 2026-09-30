@@ -91,7 +91,7 @@ Tell the developer what you found:
 ```
 This entry contains [N] promotion candidates:
 - "Chose per-invoice rate over per-container" → ADR
-- "Always decrement both weight and pieces on sale" → context/integrations/...
+- "Always decrement both weight and pieces on sale" → context/code-standards.md
 
 Draft them now? (yes / pick / skip)
 ```

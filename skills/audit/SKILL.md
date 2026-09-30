@@ -21,7 +21,6 @@ code as it is. No history, no plans.
 | `docs/schema.d2` | the database diagram, generated with `/fa:efcore-d2-db-diagram` and linked from `context/architecture.md` under *Data & domain model* | .NET repos with a `DbContext`; create if missing |
 | `context/glossary.md` | the domain terms the code uses, one line each, vocabulary only | add missing terms; never redefine an existing one, flag it |
 | `context/ui-rules.md` | design system package, RTL and i18n, accessibility | replace `_TODO_`; skip if no UI |
-| `context/integrations/<name>.md` | one per external system: database, auth, queue, third-party API | create if missing, from the README template there |
 | `<area>/AGENTS.md` | overview, key files, conventions, gotchas of one area | create only where the area has conventions the root files do not state |
 
 Never rewrite a line a human wrote. If the code contradicts curated content,

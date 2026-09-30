@@ -1,7 +1,6 @@
 # Code Standards
 
-**Function:** Team-wide coding conventions for this project. Augmented by
-the per-technology files in `context/integrations/`. Present-tense only —
+**Function:** Team-wide coding conventions for this project. Present-tense only —
 if a standard changes, this file is rewritten, not appended to.
 
 ---

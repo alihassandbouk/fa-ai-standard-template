@@ -1,6 +1,6 @@
 {
   "name": "fa",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "FA AI Development Standard: the process skills (architect, review, recover, remember, imprint, audit, sync), the repo scaffold (init), and the TFA .NET skills (development guard, FAST Core integration).",
   "author": {
     "name": "FA",

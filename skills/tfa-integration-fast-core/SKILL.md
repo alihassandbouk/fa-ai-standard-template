@@ -86,8 +86,7 @@ at undocumented core-system behaviour.
 - Build and run the tests.
 - Exercise the new endpoints or flows for real where possible (a local
   stand-in database or a locally issued token is fine; say so in the report).
-- Write `context/integrations/<name>.md` for the project, shaped like
-  `references/sso-integration-example.md`.
+- Record the integration in `context/architecture.md` under *System Boundaries* (what talks to what, auth, the settings keys). If the core team needs a hand-off document, write it as `docs/<name>-integration.md` shaped like `references/sso-integration-example.md`.
 - Report what was built, what was verified, and what is still needed from the
   core team (credentials, schema, scopes).
 
@@ -132,5 +131,5 @@ Update this table when a guide is added.
 - `guides/` — one file per integration method.
 - `references/sso-integration-example.md` — a finished, real integration
   document (Expert Hub ↔ FAST SSO): the model for the
-  `context/integrations/<name>.md` you write in Step 5, and the document to
+  hand-off document you may write in Step 5, and the document to
   send the core team when requesting a client registration.
