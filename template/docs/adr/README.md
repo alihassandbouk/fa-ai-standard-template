@@ -1,7 +1,7 @@
 # Architecture Decision Records (ADR)
 
 **Function:** The append-only history of architectural decisions. Written
-via `/architect` before implementation of the affected feature
+via `/fa:grill-with-docs` before implementation of the affected feature
 begins. **Never edit an accepted ADR** — if a decision changes, write a new
 ADR that supersedes the old one.
 

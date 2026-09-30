@@ -35,9 +35,11 @@ The normal life of a project:
 ```
 /fa:init          once, scaffolds the standard
 /fa:audit         once, fills the context files from existing code
-/fa:architect     before each feature: decisions, ADRs, then build
-/fa:review        after each feature
-/fa:sync          before merge: keeps context/*.md true
+/fa:grill-with-docs   before each feature: interview, glossary, ADRs, plan
+/fa:implement         build it test-first at the agreed seams
+/fa:review            three layers, in parallel
+/fa:pr                the PR body
+/fa:sync              before merge: keeps context/*.md true
 /fa:remember save at the end of the session (a hook reminds you)
 ```
 
@@ -136,6 +138,10 @@ command and why it is worth having.
 | dotnet-ef | `dotnet tool install --global dotnet-ef` | Migrations in `/fa:tfa-development-guard`. |
 | [GitHub CLI](https://cli.github.com) | package manager, then `gh auth login` | PRs and issues from the terminal. |
 
+Several skills here are adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills)
+(MIT): grill-with-docs, implement's TDD rules, recover's bug loop, review's
+parallel axes and smell baseline, pr, and the git guardrails hook.
+
 Third-party skills install into `~/.claude/skills/` (add `-g` to the
 `npx skills add` command for that) or into the project's `.claude/skills/`.
 Update them with `npx skills update`.
@@ -146,13 +152,15 @@ Update them with `npx skills update`.
 |---|---|
 | `/fa:init` | Once per repo. Scaffolds the standard from `template/`. In a .NET repo, also copies the TFA rules into `context/code-standards.md`. |
 | `/fa:audit` | Context files still have `_TODO_`s, or one area needs an `AGENTS.md`. |
-| `/fa:architect` | Before building. Aligns terms, decides, plans, writes ADRs, then implements. |
+| `/fa:grill-with-docs` | Before building. Interviews until every decision is settled, writes the glossary and ADRs as it goes, ends with a plan naming the seams to test. |
+| `/fa:implement` | Builds the plan test-first at the agreed seams, then hands to review. |
+| `/fa:pr` | PR body: one visual, before-and-after evidence, merge danger. |
 | `/fa:review` | After building. Plan, system, production readiness. In .NET repos also the TFA review checklist. |
 | `/fa:sync` | Before merge. Keeps `context/*.md` and `AGENTS.md` true; flags decisions with no ADR. |
 | `/fa:remember` | `restore` at session start, `save` at session end. Repo diary, committed. |
 | `/fa:diary` | The developer's personal diary, across all repos. Claude logs decisions and research as they happen. |
 | `/fa:imprint` | After building UI. Verifies against `context/ui-rules.md`, records the pattern. |
-| `/fa:recover` | Something went wrong. Diagnose the failure type before fixing. |
+| `/fa:recover` | Something went wrong. Diagnose the failure type; hard bugs get the feedback-loop discipline. |
 | `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard, layer templates, refactoring workflow, checklists. |
 | `/fa:tfa-integration-fast-core` | Integrating with FAST Core: REST, SSO, or DB views. |
 | `/fa:efcore-d2-db-diagram` | Generate a D2 entity-relationship diagram from EF Core models into `docs/schema.d2`. |
@@ -165,6 +173,9 @@ description; typing the name is not required.
 - **SessionStart**: prints the last entry of `diary/repo/` into context, so
   every session starts with the previous handoff, plus a one-line reminder to
   search the personal diary before touching an area with history.
+- **PreToolUse** on Bash: blocks destructive git before it runs (force push,
+  `reset --hard`, `clean -f`, `branch -D`, `checkout .`, `restore .`). Plain
+  `git push` stays allowed.
 - **Stop**, once per session: if the repo diary is older than the work done,
   asks Claude to run `/fa:remember save`; if nothing was logged to the
   personal diary, asks for a session entry. Both are silent when there is
@@ -201,7 +212,7 @@ skills/           one folder per skill, SKILL.md plus references/
 hooks/            hooks.json, session-start.sh, stop.sh
 scripts/diary     personal diary CLI
 template/         what /fa:init copies into a project:
-                    CLAUDE.md, context/, docs/adr/, diary/repo/, .gitignore
+                    CLAUDE.md, context/ (incl. glossary), docs/adr/, diary/repo/, .gitignore
 ```
 
 ## Developing the plugin

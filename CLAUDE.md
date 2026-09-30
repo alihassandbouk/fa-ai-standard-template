@@ -14,3 +14,8 @@ plugin (`fa`) plus the scaffold it installs into projects.
 Test locally with `claude --plugin-dir .` and `claude plugin validate .`.
 Skill bodies are read on invoke only, so a skill that must be honoured every
 session belongs in `template/CLAUDE.md`, not in a skill.
+
+Writing rules for skills and context files (after Matt Pocock's
+`writing-for-agents`): one source of truth per fact, so a rule lives in one
+file and others point to it; say what to do, not what to avoid; delete any
+line that would not change the model's behaviour.

@@ -15,6 +15,7 @@ short; everything else is read on demand.
 @context/architecture.md
 @context/code-standards.md
 @context/ui-rules.md
+@context/glossary.md
 
 Before touching an area, also read that area's `AGENTS.md` if one exists
 (`/fa:audit` writes them). `docs/adr/`, `diary/` and `context/integrations/`
@@ -32,6 +33,7 @@ are read when the task needs them, not every session.
 
 ## Session rhythm
 
-- Start: `/fa:remember restore`. End: `/fa:remember save`.
-- Change landed: `/fa:sync` keeps the context files true.
-- Built UI: `/fa:imprint`. Stuck: `/fa:recover`.
+- Start: the last diary entry is already in context; confirm it.
+- Feature: `/fa:grill-with-docs` (design, glossary, ADRs) → `/fa:implement`
+  (test-first at the agreed seams) → `/fa:review` → `/fa:pr` → `/fa:sync`.
+- End: `/fa:remember save`. Built UI: `/fa:imprint`. Stuck: `/fa:recover`.

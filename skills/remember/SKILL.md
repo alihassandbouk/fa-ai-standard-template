@@ -81,9 +81,10 @@ Omit empty sections. Half a screen is usually right.
 
 Review the draft entry and ask, for each item:
 
-1. **Is this a decision with lasting consequences?** → It needs an ADR. Offer to draft one in `docs/adr/` now (numbered, never edited, superseded only).
-
-3. **Is this a convention the agent should follow every session?** → It belongs in a context file or `CLAUDE.md`.
+1. **Is this a decision that is hard to reverse, surprising without context, and the result of a real trade-off?** → It needs an ADR. Offer to draft one in `docs/adr/` now (numbered, never edited, superseded only).
+2. **Is this a convention the agent should follow every session?** → It belongs in a context file or `CLAUDE.md`.
+3. **Did a term get defined or redefined?** → `context/glossary.md`.
+4. **Retro: did anything happen this session that a lint rule, a CI check, a test, or one line of context would have prevented?** → Propose that fix. Mechanical rules go to tooling, never to `CLAUDE.md`; navigation facts go to the nearest `AGENTS.md`.
 
 Tell the developer what you found:
 

@@ -21,7 +21,7 @@ Before reviewing anything, establish the benchmark.
 
 Read in this order:
 
-- The implementation plan from `/architect` if one exists
+- The implementation plan from `/fa:grill-with-docs` if one exists
 - The feature description or task that was given
 - Any relevant context files — architecture boundaries, code standards, design rules
 
@@ -29,7 +29,9 @@ If no plan exists, ask the developer to describe what the feature was supposed t
 
 ---
 
-## Step 2 — Review in Three Layers
+## Step 2 — Review in Three Layers, in parallel
+
+Pin the diff first: `git diff $(git merge-base main HEAD)...HEAD` on a branch, `git diff HEAD` on main; confirm it is non-empty. Then run each layer as its own read-only subagent with the diff, the sources it needs, and a brief of under 400 words, so a long review never pollutes the main context. Every layer skips anything a linter, formatter, type checker or CI already enforces. Findings are reported per layer and never merged or re-ranked across layers: a change can pass one layer and fail another, and one must not mask the other.
 
 ### Layer 1 — Does it match the plan?
 
@@ -53,6 +55,7 @@ Check:
 - **Design system** — are the correct tokens, classes, and patterns used? Any hardcoded values that should be variables? Any raw color classes that should use the design system?
 - **Code standards** — naming conventions, file organisation, TypeScript strictness, error handling patterns — do they match what the project established?
 - **Existing patterns** — does this feature introduce a new pattern when an existing one should have been used?
+- **Smell baseline** (always a judgement call, and a documented project standard overrides it): mysterious name, duplicated code, feature envy, data clumps, primitive obsession, repeated switches, shotgun surgery, divergent change, speculative generality, message chains, middle man, refused bequest. Name the smell, quote the hunk, say the fix.
 - **.NET repos** — also run the Review Checklist and the skinny-controller validation procedure from `/fa:tfa-development-guard`, and report its "Skinny controller check" block.
 
 ### Layer 3 — Is it production ready?
@@ -86,7 +89,7 @@ After completing all three layers, produce a clear report. Do not bury issues. D
 [List any error handling gaps, edge cases, or obvious bugs]
 
 ### Summary
-[X] issues found across [Y] layers.
+Per layer: <count>, worst: <one line>. No single winner across layers.
 
 [If no issues: "No issues found. This feature is ready to ship."]
 [If issues: "Resolve the above before moving to the next feature."]

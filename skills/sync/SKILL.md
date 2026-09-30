@@ -27,8 +27,9 @@ describing the past misleads every later session.
    a paragraph. A brand-new area with real conventions gets an `AGENTS.md` in
    the `/fa:audit` shape and a line in `context/architecture.md`.
 4. **Flag, do not fix:**
-   - a decision a teammate would ask "why?" about in six months, with no ADR
-     in `docs/adr/` → *needs ADR, run `/fa:architect`*
+   - a decision that is hard to reverse, surprising without context, and the
+     result of a real trade-off, with no ADR in `docs/adr/` → *needs ADR, run
+     `/fa:grill-with-docs`*
    - a requirement (ticket or spec named in the diff or commits) that changed
      while its tests did not → *non-negotiable violation*
    - curated prose the code now contradicts → list it, leave it

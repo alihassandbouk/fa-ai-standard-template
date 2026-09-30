@@ -19,6 +19,7 @@ code as it is. No history, no plans.
 | `context/code-standards.md` | conventions observed in the code: naming, tests, errors, logging | replace `_TODO_` only |
 | `context/code-standards.md`, `## .NET standard` | the TFA rules from `${CLAUDE_PLUGIN_ROOT}/skills/tfa-development-guard/references/standards.md` | append if the repo is .NET and the heading is missing |
 | `docs/schema.d2` | the database diagram, generated with `/fa:efcore-d2-db-diagram` and linked from `context/architecture.md` under *Data & domain model* | .NET repos with a `DbContext`; create if missing |
+| `context/glossary.md` | the domain terms the code uses, one line each, vocabulary only | add missing terms; never redefine an existing one, flag it |
 | `context/ui-rules.md` | design system package, RTL and i18n, accessibility | replace `_TODO_`; skip if no UI |
 | `context/integrations/<name>.md` | one per external system: database, auth, queue, third-party API | create if missing, from the README template there |
 | `<area>/AGENTS.md` | overview, key files, conventions, gotchas of one area | create only where the area has conventions the root files do not state |
@@ -60,6 +61,5 @@ list it under **Contradictions** in the report and leave the file alone.
 
 ## Not this skill
 
-Specs and tickets (`/fa:architect` reads them), ADRs (`/fa:architect` writes
-them), upkeep after a change (`/fa:sync`). A repo with no `context/` at all
+Specs and tickets (`/fa:grill-with-docs` reads them), ADRs (it writes them), upkeep after a change (`/fa:sync`). A repo with no `context/` at all
 needs `/fa:init` first.

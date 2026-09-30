@@ -96,49 +96,33 @@ Here is how we handle this:
 
 ## Step 3A — Targeted Fix
 
-For Failure Mode 1.
+For Failure Mode 1. The loop is adapted from Matt Pocock's `diagnosing-bugs` (MIT). Redact every secret in anything you show as `<REDACTED>`.
 
-### Diagnose before touching code
+### Phase 1 — Build a feedback loop (this is the skill)
 
-Ask the developer to share:
+Before any theory, get **one command** that goes red on this bug and green when it is fixed: a failing test at the seam that reaches the bug, a curl against the dev server, a CLI run diffed against a known-good output, a headless-browser script, a replayed captured payload, a throwaway harness, a fuzz loop, a bisection harness. Run it once and show the invocation and output. It must be red-capable on the **user's exact symptom**, deterministic, seconds not minutes, and runnable unattended. Flaky bug: raise the reproduction rate until it is debuggable. Cannot build one: stop, list what you tried, ask for an environment, a redacted artifact, or permission to instrument. **No red-capable command, no Phase 2.** Reading code to form a theory before this command exists is the failure this step prevents.
 
-- The exact error message or wrong behaviour
-- The specific file or function where it happens
-- What the code is supposed to do versus what it actually does
+### Phase 2 — Reproduce and minimise
 
-Read the relevant code. Do not read the entire codebase — only what is directly relevant to the problem.
+Run the loop, watch it go red, confirm it is the user's failure and not a nearby one. Then cut inputs, callers, config and steps one at a time, re-running after each cut, until every remaining element is load-bearing.
 
-### Find the root cause
+### Phase 3 — Hypothesise
 
-Identify the root cause before suggesting any fix. A root cause is the actual reason the problem exists — not a symptom of it.
+Write three to five ranked hypotheses before testing any. Each must predict: "If X is the cause, then changing Y makes the bug disappear." No prediction, no hypothesis. Show the list to the developer; they often re-rank it instantly.
 
-State the root cause clearly:
+### Phase 4 — Instrument
 
-```
-Root cause: [specific explanation of why this is happening]
+One variable per probe, each probe mapped to a prediction. Debugger over logs; targeted logs over "log everything". Tag every debug log `[DEBUG-xxxx]` so cleanup is one grep. Performance bug: measure a baseline and bisect, do not log.
 
-This is different from the symptom because: [explanation]
-```
+### Phase 5 — Fix with a regression test
 
-### Suggest a precise fix
+If a correct seam exists, turn the minimised repro into a failing test there, watch it fail, fix, watch it pass, then re-run the original Phase 1 loop. If no correct seam exists, that is a finding: record it.
 
-Describe the fix that addresses the root cause. Not a workaround. Not a patch on top of broken code.
+### Phase 6 — Cleanup
 
-```
-Fix: [what needs to change and why]
+Original repro green, regression test in, every `[DEBUG-` line removed, throwaway harnesses deleted, the confirmed hypothesis stated in the commit message.
 
-This will resolve the root cause because: [explanation]
-```
-
-Wait for the developer to confirm before making any changes.
-
-### If the fix does not work
-
-If the suggested fix does not resolve the problem — stop. Do not suggest another fix immediately.
-
-Re-examine the root cause diagnosis. If the fix did not work, the root cause was probably wrong. Diagnose again from the beginning before trying again.
-
-If two root cause diagnoses have both been wrong — this may actually be Failure Mode 2 or 3. Re-evaluate.
+If two hypotheses rounds have both been wrong, this may be Failure Mode 2 or 3. Re-evaluate.
 
 ---
 
