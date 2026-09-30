@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SessionStart: stdout is added to context.
 # 1. one line about the personal diary  2. the last entry of each author's newest repo diary file
-echo "Personal diary: run \`diary search <terms> --since 30d\` (CLI: ${CLAUDE_PLUGIN_ROOT:-<plugin root>}/bin/diary) before working on an area that may have history; log decisions when they happen, not at the end."
+echo "Personal diary: run \`diary search <terms> --since 30d\` (CLI: ${CLAUDE_PLUGIN_ROOT:-<plugin root>}/scripts/diary) before working on an area that may have history; log decisions when they happen, not at the end."
 root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 files=$(ls "$root"/diary/repo/*-*-*.md 2>/dev/null | sort) || true
 [ -n "$files" ] || exit 0

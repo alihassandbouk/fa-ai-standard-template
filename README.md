@@ -1,7 +1,45 @@
-# FA AI Development Standard — plugin
+# FA AI Development Standard — the `fa` plugin
 
-One Claude Code plugin (`fa`) that carries the process skills, the repo
-scaffold, and the TFA .NET skills, installed and updated from this repo.
+One Claude Code plugin that gives every FA developer the same skills, the same
+repo scaffold, the same hooks and the same MCP connections, installed from
+this repo and updated from it.
+
+1. [How it works](#how-it-works)
+2. [Install](#install)
+3. [Update and release](#update-and-release)
+4. [Enterprise rollout](#enterprise-rollout)
+5. [MCP servers: Jira, Confluence, Notion](#mcp-servers-jira-confluence-notion)
+6. [Tools and skills not in the plugin](#tools-and-skills-not-in-the-plugin)
+7. [Skills](#skills)
+8. [Hooks](#hooks)
+9. [The two diaries](#the-two-diaries)
+10. [Repo layout](#repo-layout)
+11. [Developing the plugin](#developing-the-plugin)
+
+## How it works
+
+A Claude Code plugin is a folder with a manifest. When it is enabled, Claude
+Code loads its `skills/` (as `/fa:<name>`), runs its `hooks/`, connects its
+`.mcp.json` servers, and puts nothing else in your session. Only each skill's
+one-paragraph description is loaded every session; the body loads when the
+skill runs.
+
+What the plugin cannot do is change a project. That is what `/fa:init` is
+for: it copies `template/` into the repo. The scaffold's `CLAUDE.md` imports
+the four `context/*.md` files, so from then on every session in that repo
+starts with the project's overview, architecture, code standards and UI rules
+already in context. Facts live in those files; procedures live in the skills.
+
+The normal life of a project:
+
+```
+/fa:init          once, scaffolds the standard
+/fa:audit         once, fills the context files from existing code
+/fa:architect     before each feature: decisions, ADRs, then build
+/fa:review        after each feature
+/fa:sync          before merge: keeps context/*.md true
+/fa:remember save at the end of the session (a hook reminds you)
+```
 
 ## Install
 
@@ -10,33 +48,40 @@ claude plugin marketplace add alihassandbouk/fa-ai-standard-template
 claude plugin install fa@fa-ai
 ```
 
+Or inside a session: `/plugin`, add the marketplace, install `fa`. The repo
+is fetched with your machine's git credentials, so a private repo needs an
+SSH key or a credential helper that can read it. Nothing else to configure.
+
 Then in any project:
 
 ```
-/fa:init      # scaffold CLAUDE.md, context/, docs/adr/, diary/
-/fa:audit     # fill the context files from an existing codebase
+/fa:init
 ```
 
-Private repo: the marketplace is fetched with the machine's git credentials
-(SSH key or credential helper). Nothing else to configure.
+## Update and release
 
-## Update
+Installed copies are pinned to the `version` in
+`.claude-plugin/plugin.json`. A release is a bump of that string and a push.
+Developers pick it up with:
 
 ```bash
 claude plugin marketplace update fa-ai
 claude plugin update fa@fa-ai
 ```
 
-A release is a bump of `version` in `.claude-plugin/plugin.json` plus a push.
-Installed copies stay pinned until that string changes.
+Marketplaces registered through managed settings with `autoUpdate` refresh
+on their own.
 
 ## Enterprise rollout
 
-Drop this into the managed settings file (`/etc/claude-code/managed-settings.json`
-on Linux, `/Library/Application Support/ClaudeCode/managed-settings.json` on
-macOS, `C:\ProgramData\ClaudeCode\managed-settings.json` on Windows, or the
-equivalent MDM policy). Every developer then gets the plugin, kept current,
-and cannot add marketplaces outside the org:
+Put this in the managed settings file and every developer gets the plugin,
+kept current, and cannot add marketplaces outside the organisation:
+
+| OS | Path |
+|---|---|
+| Linux | `/etc/claude-code/managed-settings.json` |
+| macOS | `/Library/Application Support/ClaudeCode/managed-settings.json` |
+| Windows | `C:\ProgramData\ClaudeCode\managed-settings.json` |
 
 ```json
 {
@@ -53,74 +98,119 @@ and cannot add marketplaces outside the org:
 }
 ```
 
-For a single team without MDM, the same `extraKnownMarketplaces` and
-`enabledPlugins` keys go in the project's `.claude/settings.json`; teammates
-are offered the plugin when they trust the folder.
+The same file can be delivered as an MDM policy. For one team without MDM,
+the `extraKnownMarketplaces` and `enabledPlugins` keys go in the project's
+`.claude/settings.json`; teammates are offered the plugin when they trust
+the folder.
 
-## What is in it
+## MCP servers: Jira, Confluence, Notion
+
+The plugin declares two remote servers in `.mcp.json`:
+
+| Server | URL | Gives |
+|---|---|---|
+| `atlassian` | `https://mcp.atlassian.com/v2/mcp` | Jira and Confluence |
+| `notion` | `https://mcp.notion.com/mcp` | Notion |
+
+They connect when the plugin is enabled. Each developer signs in once, in a
+session, with `/mcp` and the browser OAuth flow; tokens are stored per user
+and refreshed automatically. No keys live in this repo. A server you do not
+use can be switched off in `/mcp` without touching the plugin.
+
+The skills do not depend on these servers. They are there so a developer can
+read a ticket, search Confluence, or update a Notion page in the same session
+as the code.
+
+## Tools and skills not in the plugin
+
+These are installed per machine, not by the plugin. Each line is the install
+command and why it is worth having.
+
+| Tool or skill | Install | Why |
+|---|---|---|
+| [playwright-cli](https://github.com/microsoft/playwright-cli) and its skill | `npm install -g @playwright/cli@latest && playwright-cli install --skills` | Drives a browser to verify UI. The skill must match the CLI version, so it stays with the CLI installer. |
+| [Impeccable](https://impeccable.style) | `npx skills add pbakaus/impeccable` | Frontend design, critique and polish. Pairs with `/fa:imprint`. |
+| [Vercel React best practices](https://skills.sh/vercel-labs/agent-skills) | `npx skills add vercel-labs/agent-skills@react-best-practices` | React and Next.js performance rules. |
+| [Web interface guidelines](https://skills.sh/vercel-labs/agent-skills) | `npx skills add vercel-labs/agent-skills@web-design-guidelines` | Accessibility and UX review. |
+| [d2](https://d2lang.com/tour/install) | see the install page for your OS | Renders the `.d2` diagrams `/fa:efcore-d2-db-diagram` produces. |
+| dotnet-ef | `dotnet tool install --global dotnet-ef` | Migrations in `/fa:tfa-development-guard`. |
+| [GitHub CLI](https://cli.github.com) | package manager, then `gh auth login` | PRs and issues from the terminal. |
+
+Third-party skills install into `~/.claude/skills/` (add `-g` to the
+`npx skills add` command for that) or into the project's `.claude/skills/`.
+Update them with `npx skills update`.
+
+## Skills
 
 | Skill | When |
 |---|---|
-| `/fa:init` | Once per repo. Scaffolds the standard from `template/`. |
+| `/fa:init` | Once per repo. Scaffolds the standard from `template/`. In a .NET repo, also copies the TFA rules into `context/code-standards.md`. |
 | `/fa:audit` | Context files still have `_TODO_`s, or one area needs an `AGENTS.md`. |
-| `/fa:architect` | Before building. Decisions → ADRs. |
-| `/fa:review` | After building. Plan, system, production readiness. |
-| `/fa:sync` | Before merge. Keeps `context/*.md` and `AGENTS.md` true. |
-| `/fa:remember` | `restore` at session start, `save` at session end. |
-| `/fa:imprint` | After building UI. Records the composition pattern. |
-| `/fa:recover` | Something went wrong. Diagnose before fixing. |
+| `/fa:architect` | Before building. Aligns terms, decides, plans, writes ADRs, then implements. |
+| `/fa:review` | After building. Plan, system, production readiness. In .NET repos also the TFA review checklist. |
+| `/fa:sync` | Before merge. Keeps `context/*.md` and `AGENTS.md` true; flags decisions with no ADR. |
+| `/fa:remember` | `restore` at session start, `save` at session end. Repo diary, committed. |
 | `/fa:diary` | The developer's personal diary, across all repos. Claude logs decisions and research as they happen. |
-| `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard. |
+| `/fa:imprint` | After building UI. Verifies against `context/ui-rules.md`, records the pattern. |
+| `/fa:recover` | Something went wrong. Diagnose the failure type before fixing. |
+| `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard, layer templates, refactoring workflow, checklists. |
 | `/fa:tfa-integration-fast-core` | Integrating with FAST Core: REST, SSO, or DB views. |
-| `/fa:efcore-d2-db-diagram` | Generate a D2 entity-relationship diagram from EF Core models. |
+| `/fa:efcore-d2-db-diagram` | Generate a D2 entity-relationship diagram from EF Core models into `docs/schema.d2`. |
 
-The scaffold a project receives:
+Claude also invokes a skill on its own when a request matches its
+description; typing the name is not required.
 
-```
-CLAUDE.md            # non-negotiables, @imports of context/*.md
-context/             # present-tense source of truth, imported every session
-docs/adr/            # append-only decisions
-diary/repo/          # committed session log, one file per day per author
-```
-
-## Hooks the plugin ships
+## Hooks
 
 - **SessionStart**: prints the last entry of `diary/repo/` into context, so
-  every session starts with the previous handoff. Nothing to type.
-- **Stop**: once per session, if the repo diary is older than the work done,
-  reminds Claude to run `/fa:remember save`. Silent in repos without
-  `diary/repo/`.
+  every session starts with the previous handoff, plus a one-line reminder to
+  search the personal diary before touching an area with history.
+- **Stop**, once per session: if the repo diary is older than the work done,
+  asks Claude to run `/fa:remember save`; if nothing was logged to the
+  personal diary, asks for a session entry. Both are silent when there is
+  nothing to save.
 
-- **Stop** (second): once per session, if nothing was logged to the personal
-  diary, reminds Claude to write a session entry.
-
-The repo-diary hooks are plain bash; the personal diary is `bin/diary`,
+The repo-diary hooks are plain bash; the personal diary is `scripts/diary`,
 Python 3 with no dependencies.
 
-## The personal diary
+## The two diaries
 
-Every developer gets a private, append-only journal at `~/.claude/diary`,
-written by Claude through the `diary` CLI: one entry per session, plus one
-after each decision, heavy research or non-obvious fix. It works locally from
-the first session. To keep it across machines or backed up, set a private git
-remote once:
+| | Repo diary | Personal diary |
+|---|---|---|
+| Where | `diary/repo/YYYY-MM-DD.<author>.md`, committed | `~/.claude/diary`, per machine |
+| For | teammates: what changed, decisions, next step | the developer: decisions, research, fixes across every repo |
+| Written by | `/fa:remember save` | Claude, through `scripts/diary`, as things happen |
+| Conflicts | one file per author per day, so branches merge clean | one file per machine per day |
+
+The personal diary works locally from the first session. To keep it across
+machines or backed up, set a private git remote once:
 
 ```bash
-python3 ~/.claude/plugins/cache/fa-ai/fa/<version>/bin/diary sync --remote git@github.com:<you>/diary.git
+python3 ~/.claude/plugins/cache/fa-ai/fa/<version>/scripts/diary sync --remote git@github.com:<you>/diary.git
 ```
 
 After that `diary sync` at the end of a session commits and exchanges
-entries. Each machine writes only its own day files, so nothing conflicts.
+entries.
 
-## Recommended companions
+## Repo layout
 
-- [playwright-cli](https://github.com/microsoft/playwright-cli):
-  `npm install -g @playwright/cli@latest && playwright-cli install --skills`
-- [Impeccable](https://impeccable.style): `npx skills add pbakaus/impeccable`
+```
+.claude-plugin/   plugin.json (name, version) and marketplace.json (source ./)
+.mcp.json         Atlassian and Notion remote servers
+skills/           one folder per skill, SKILL.md plus references/
+hooks/            hooks.json, session-start.sh, stop.sh
+scripts/diary     personal diary CLI
+template/         what /fa:init copies into a project:
+                    CLAUDE.md, context/, docs/adr/, diary/repo/, .gitignore
+```
 
 ## Developing the plugin
 
 ```bash
-claude plugin validate .        # manifests
-claude --plugin-dir . # run a session with the working copy loaded
+claude plugin validate .   # manifests, hooks, MCP entries
+claude --plugin-dir .      # a session with the working copy loaded
 ```
+
+Rules of the repo are in `CLAUDE.md`: keep skill descriptions short (they
+load every session), put facts in `template/` context files and procedures in
+skills, and bump `version` on every release.

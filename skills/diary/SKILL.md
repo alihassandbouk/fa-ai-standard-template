@@ -10,7 +10,7 @@ Storage: `~/.claude/diary/YYYY/MM/YYYY-MM-DD.<machine>.md` — one file per day
 per machine, entries appended in time order. The `diary` CLI is the only thing
 that should write to it — never hand-edit or overwrite a day file.
 
-The CLI ships with this plugin: `${CLAUDE_PLUGIN_ROOT}/bin/diary` (Python 3,
+The CLI ships with this plugin: `${CLAUDE_PLUGIN_ROOT}/scripts/diary` (Python 3,
 no dependencies). Use that path unless `diary` is on PATH. It works locally
 with no setup. A developer who works on more than one machine, or wants a
 backup, points it at a private git remote once with

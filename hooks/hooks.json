@@ -23,7 +23,7 @@
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/bin/diary\" hook-stop",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/diary\" hook-stop",
             "timeout": 5
           }
         ]
