@@ -39,7 +39,7 @@ If no filepath is given, identify the screen or component files created or modif
 
 ## Step 1 — Verify Against the System
 
-The rules are in `context/ui-rules.md`, already in context. Read the new UI code and check every rule there, in this order: imports (design-system package only, no shadow components), values (no hard-coded tokens), language (translation layer, RTL and LTR), role fit (the right component per `context/ui-patterns.md`). A missing component is a design-system gap to ticket, never something to build locally. When existing patterns answer a question and the new screen deviates, that is a finding, not a preference.
+The rules are in `context/ui-rules.md`, already in context. Read the new UI code and check every rule there, in this order: imports (the design-system package, or a local build recorded in `context/ui-patterns.md`), values (no hard-coded tokens), language (translation layer, RTL and LTR), role fit (the right component per `context/ui-patterns.md`). A component the design system lacks is built locally with its variables and recorded in `context/ui-patterns.md`; a local build with no entry there is a finding. When existing patterns answer a question and the new screen deviates, that is a finding, not a preference.
 
 Report findings before capturing anything:
 
@@ -50,7 +50,7 @@ Report findings before capturing anything:
 [or]
 Findings:
 - [file:line] — [what deviates, and what the pattern says]
-- Design-system gap: [component that was needed and missing]
+- Unrecorded local build: [component built locally with no ui-patterns entry]
 
 Fix these first, capture after? Or capture as-is? (fix / capture)
 ```
@@ -101,7 +101,7 @@ Imprinted [screen] → context/ui-patterns.md
 
 - Verification: [PASS / N findings, developer chose …]
 - Pattern: [followed "List screen" / added "Wizard flow" / updated "…"]
-- Design-system gaps flagged: [none / component → ticket]
+- Local builds recorded: [none / component → ui-patterns entry]
 ```
 
 ---
@@ -112,7 +112,7 @@ Run when product UI already exists and pattern consistency is uncertain, or befo
 
 1. **Scan** every screen in the product. Group them by what they do: lists, detail views, create/edit flows, dashboards, empty/error handling.
 2. **Extract the dominant pattern per group** — the composition most screens already share — and every deviation from it: same job, different shape.
-3. **Report** patterns and conflicts. For each conflict, recommend which shape should win, based on what the majority does and what the design system intends. Also list every design-system gap found (local shadow components, raw elements doing a component's job).
+3. **Report** patterns and conflicts. For each conflict, recommend which shape should win, based on what the majority does and what the design system intends. Also list every local build with no entry in `context/ui-patterns.md`, and every raw element doing a component's job.
 4. **Wait.** Do not write the registry, do not fix screens. Present, ask, and only after the developer confirms the baseline, write `context/ui-patterns.md` and produce the fix list of deviating screens.
 
 ---

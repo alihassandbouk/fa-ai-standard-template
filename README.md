@@ -167,6 +167,7 @@ Update them with `npx skills update`.
 | `/fa:remember` | `restore` at session start, `save` at session end. Repo diary, committed. |
 | `/fa:diary` | The developer's personal diary, across all repos. Claude logs decisions and research as they happen. |
 | `/fa:imprint` | After building UI. Verifies against `context/ui-rules.md`, records the pattern. |
+| `/fa:dga` | Any UI in a React project. Builds from the official DGA Platforms Code components through their React adapter, never a vendored copy; sets the package up on the first UI session, adds the lint rule, and carries the catalogue, the RTL, Hijri and accessibility rules, and the gotchas the package does not document. |
 | `/fa:recover` | Something went wrong. Diagnose the failure type; hard bugs get the feedback-loop discipline. |
 | `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard, layer templates, refactoring workflow, checklists. |
 | `/fa:tfa-integration-fast-core` | Integrating with FAST Core: REST, SSO, or DB views. |
