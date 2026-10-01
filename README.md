@@ -8,7 +8,7 @@ this repo and updated from it.
 2. [Install](#install)
 3. [Update and release](#update-and-release)
 4. [Enterprise rollout](#enterprise-rollout)
-5. [MCP servers: Jira, Confluence, Notion](#mcp-servers-jira-confluence-notion)
+5. [MCP servers: Jira, Confluence, Notion, Figma](#mcp-servers-jira-confluence-notion-figma)
 6. [Tools and skills not in the plugin](#tools-and-skills-not-in-the-plugin)
 7. [Skills](#skills)
 8. [Hooks](#hooks)
@@ -35,12 +35,14 @@ The normal life of a project:
 ```
 /fa:init          once, scaffolds the standard
 /fa:audit         once, fills the context files from existing code
-/fa:grill-with-docs   before each feature: interview, glossary, ADRs, plan
+/fa:grill-with-docs   before each feature: interview, glossary, ADRs, plan;
+                      runs to-spec when there is no ticket and to-tickets when
+                      the plan exceeds one session
 /fa:implement         build it test-first at the agreed seams
 /fa:review            three layers, in parallel
-/fa:pr                the PR body
-/fa:sync              before merge: keeps context/*.md true
-/fa:remember save at the end of the session (a hook reminds you)
+/fa:sync              keeps context/*.md true
+/fa:remember save     the repo diary entry (a hook reminds you at any session end)
+/fa:pr                the PR body, once the context and diary changes are committed
 ```
 
 ## Install
@@ -105,23 +107,26 @@ the `extraKnownMarketplaces` and `enabledPlugins` keys go in the project's
 `.claude/settings.json`; teammates are offered the plugin when they trust
 the folder.
 
-## MCP servers: Jira, Confluence, Notion
+## MCP servers: Jira, Confluence, Notion, Figma
 
-The plugin declares two remote servers in `.mcp.json`:
+The plugin declares three remote servers in `.mcp.json`:
 
 | Server | URL | Gives |
 |---|---|---|
 | `atlassian` | `https://mcp.atlassian.com/v2/mcp` | Jira and Confluence |
 | `notion` | `https://mcp.notion.com/mcp` | Notion |
+| `figma` | `https://mcp.figma.com/mcp` | Figma: design context, screenshots and variables of the frames a ticket links; its own skills arrive as server resources |
 
 They connect when the plugin is enabled. Each developer signs in once, in a
 session, with `/mcp` and the browser OAuth flow; tokens are stored per user
 and refreshed automatically. No keys live in this repo. A server you do not
 use can be switched off in `/mcp` without touching the plugin.
 
-The skills do not depend on these servers. They are there so a developer can
-read a ticket, search Confluence, or update a Notion page in the same session
-as the code.
+`/fa:to-spec` and `/fa:to-tickets` create Jira issues through the Atlassian
+server and stop with a sign-in prompt when it is not connected. Every other
+skill works without them; they are there so a developer can read a ticket,
+search Confluence, read the Figma frame a ticket links, or update a Notion
+page in the same session as the code.
 
 ## Tools and skills not in the plugin
 
@@ -152,11 +157,13 @@ Update them with `npx skills update`.
 |---|---|
 | `/fa:init` | Once per repo. Scaffolds the standard from `template/`. In a .NET repo, also copies the TFA rules into `context/code-standards.md`. |
 | `/fa:audit` | Context files still have `_TODO_`s, or one area needs an `AGENTS.md`. |
-| `/fa:grill-with-docs` | Before building. Interviews until every decision is settled, writes the glossary and ADRs as it goes, ends with a plan naming the seams to test. |
-| `/fa:implement` | Builds the plan test-first at the agreed seams, then hands to review. |
+| `/fa:grill-with-docs` | Before building. Interviews until every decision is settled, writes the glossary and ADRs as it goes, ends with a plan naming the seams to test, then runs to-spec and to-tickets when they apply. |
+| `/fa:to-spec` | Run by grill when there is no ticket. Turns the grilled plan into a Jira Story or Task through the Atlassian MCP. |
+| `/fa:to-tickets` | Run by grill when the plan exceeds one session. Cuts it into Jira sub-tasks with blocking links, one per fresh session. |
+| `/fa:implement` | Builds the plan, or one sub-task, test-first at the agreed seams, then hands to review. |
 | `/fa:pr` | PR body: one visual, before-and-after evidence, merge danger. |
 | `/fa:review` | After building. Plan, system, production readiness. In .NET repos also the TFA review checklist. |
-| `/fa:sync` | Before merge. Keeps `context/*.md` and `AGENTS.md` true; flags decisions with no ADR. |
+| `/fa:sync` | After review, before the PR. Keeps `context/*.md` and `AGENTS.md` true; flags decisions with no ADR. |
 | `/fa:remember` | `restore` at session start, `save` at session end. Repo diary, committed. |
 | `/fa:diary` | The developer's personal diary, across all repos. Claude logs decisions and research as they happen. |
 | `/fa:imprint` | After building UI. Verifies against `context/ui-rules.md`, records the pattern. |
@@ -207,7 +214,7 @@ entries.
 
 ```
 .claude-plugin/   plugin.json (name, version) and marketplace.json (source ./)
-.mcp.json         Atlassian and Notion remote servers
+.mcp.json         Atlassian, Notion and Figma remote servers
 skills/           one folder per skill, SKILL.md plus references/
 hooks/            hooks.json, session-start.sh, stop.sh, git-guardrails.sh
 scripts/diary     personal diary CLI

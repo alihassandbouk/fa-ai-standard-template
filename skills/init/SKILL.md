@@ -23,10 +23,10 @@ that variable is unset, it is `../../template/` relative to this SKILL.md.
 3. Decide what happens to the `_TODO_` sections:
    - **Existing code** (source files and commit history): tell the user to run
      `/fa:audit`, which fills them from the codebase.
-   - **Greenfield**: ask one question, "In one paragraph, what is this project
-     and who is it for?", and write the answer into
-     `context/project-overview.md` under *What this project is*. Leave the
-     rest as `_TODO_`.
+   - **Greenfield**: ask two questions, "In one paragraph, what is this project
+     and who is it for?" and "Which Jira project tracks it?", and write the
+     answers into `context/project-overview.md` under *What this project is*
+     and *Work tracking*. Leave the rest as `_TODO_`.
 4. **.NET repo** (a `*.sln` or `*.csproj` exists): append the contents of
    `${CLAUDE_PLUGIN_ROOT}/skills/tfa-development-guard/references/standards.md`
    to `context/code-standards.md` under a `## .NET standard` heading, so the

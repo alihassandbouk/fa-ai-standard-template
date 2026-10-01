@@ -31,6 +31,11 @@ _TODO: per page, what the user can do there._
 
 _TODO: who this is built for, in one sentence._
 
+## Work tracking
+
+_TODO: the Jira project key, e.g. `RL`. `/fa:to-spec` and `/fa:to-tickets`
+create issues there._
+
 ## Stakeholders
 
 _TODO: business owner, tech lead, key reviewers._

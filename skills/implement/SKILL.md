@@ -11,7 +11,8 @@ TDD rules adapted from Matt Pocock's `tdd` skill (MIT).
 ## Inputs
 
 The plan from `/fa:grill-with-docs` if one exists in the conversation, else
-the ticket. Read `context/glossary.md` so names match the domain, the
+the ticket. Given a sub-task key as the argument, fetch it (`getJiraIssue`):
+its *What to build*, acceptance criteria and seams are the plan. Read `context/glossary.md` so names match the domain, the
 ADRs of the area, and the `AGENTS.md` of every area you touch. If the plan
 names no seams, ask for them before writing a test: **no test at an
 unconfirmed seam.**
@@ -48,5 +49,6 @@ If implementation shows a decision was wrong, stop, say so, and go back to
 ## Closing
 
 Full suite green, then `/fa:review`. Address what the developer picks from
-the report. Commit to the current branch with a message that names the
-ticket. `/fa:pr` writes the PR body.
+the report, then `/fa:sync` and `/fa:remember save`. Commit to the current
+branch with a message that names the ticket. A sub-task is transitioned to
+Done (`transitionJiraIssue`) once its acceptance criteria hold. `/fa:pr` writes the PR body.

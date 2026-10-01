@@ -1,6 +1,6 @@
 ---
 name: sync
-description: Keep the AI context true after a change lands. Diffs the branch against main, rewrites the lines in context/*.md and the touched areas' AGENTS.md that the change made false, and flags decisions with no ADR and tickets whose ask changed while their tests did not. Run /fa:sync as the last step before merge, after /fa:review.
+description: Keep the AI context true after a change lands. Diffs the branch against main, rewrites the lines in context/*.md and the touched areas' AGENTS.md that the change made false, and flags decisions with no ADR and tickets whose ask changed while their tests did not. Run /fa:sync after /fa:review and before /fa:pr, so the context changes ship in the same PR.
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 ---
 
@@ -34,4 +34,4 @@ describing the past misleads every later session.
      did not → *non-negotiable violation*
    - curated prose the code now contradicts → list it, leave it
 5. **Report:** edited (`file:line`), created, flagged. Then remind the
-   developer to run `/fa:remember save`.
+   developer to run `/fa:remember save`, commit, then `/fa:pr`.

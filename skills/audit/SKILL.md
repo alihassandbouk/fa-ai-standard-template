@@ -15,6 +15,7 @@ code as it is. No history, no plans.
 | Target | Content | Rule |
 |---|---|---|
 | `context/project-overview.md` | what it is, problem, pages, roles, features by page | replace `_TODO_` only |
+| `context/project-overview.md`, *Work tracking* | the Jira project key | the most common key prefix in `git log --format=%s`, confirmed with the developer; none found: ask |
 | `context/project-overview.md`, `context/code-standards.md` | target user, stakeholders, source documents, engineering mindset | the code cannot answer these: ask the developer, one question per heading, then write the answer |
 | `context/architecture.md` | stack, folder structure, boundaries, data model, deployment | replace `_TODO_` only |
 | `context/code-standards.md` | conventions observed in the code: naming, tests, errors, logging | replace `_TODO_` only |

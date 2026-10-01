@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: Before building a feature, interview the developer relentlessly until every design decision is settled, writing the glossary and ADRs as terms and decisions crystallise. Ends with an implementation plan that names the seams to test, then hands off to /fa:implement. Use before any feature; trigger phrases "grill me", "let's design", "before we build".
+description: Before building a feature, interview the developer relentlessly until every design decision is settled, writing the glossary and ADRs as terms and decisions crystallise. Ends with an implementation plan that names the seams to test, creates the Jira ticket if none exists, splits the plan into sub-tasks if it exceeds one session, then hands off to /fa:implement. Argument: the ticket key, if there is one. Use before any feature; trigger phrases "grill me", "let's design", "before we build".
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash, Agent, Write, Edit
 ---
@@ -15,9 +15,14 @@ session finds them. Then produce the plan `/fa:implement` builds from.
 
 ## Before the first question
 
-Read, do not ask about: the Jira story,
+The argument is the ticket key. No argument means no ticket exists yet;
+`/fa:to-spec` will create one at the end.
+
+Read, do not ask about: the Jira ticket when one exists, the Figma design it
+links (Figma MCP: design context and a screenshot),
 `context/glossary.md`, `docs/adr/`, and the `AGENTS.md` of the areas the
-feature touches. Never write to Jira. Anything already answered there is not
+feature touches. Never write to Jira;
+`/fa:to-spec` and `/fa:to-tickets` do that, after approval. Anything already answered there is not
 a question.
 
 ## The interview
@@ -38,6 +43,9 @@ outward. A question whose answer depends on another still open in this round
 belongs to a later round. Finding **facts** is your job, never the developer's:
 when a question needs a fact from the codebase, dispatch a read-only agent
 and ask the rest of the frontier meanwhile. **Decisions** are the developer's.
+
+The last round always holds one more question: **does the build fit one
+session?** Recommend from the step count and the layers each step crosses.
 
 Done when the frontier is empty and nothing is silently assumed. Say
 `Blueprint ready.` and do not act until the developer confirms.
@@ -73,8 +81,8 @@ glossary and ADRs are the artifacts):
 ### What we are building
 <one paragraph>
 
-### Tickets covered
-- <ticket keys; name anything in the ticket not covered and why>
+### Ticket
+- <key, and anything in it not covered and why; or "none yet">
 
 ### Decisions
 - <decision → reasoning → rejected; ADR-00X where one was written>
@@ -86,7 +94,15 @@ glossary and ADRs are the artifacts):
 1. <ordered, each a vertical slice>
 ```
 
-Then: `Run /fa:implement to build this.`
+## The handoff, enforced here
+
+Run the next steps yourself, in this order, with the Skill tool:
+
+1. No ticket → `/fa:to-spec`. It creates the ticket and returns the key.
+2. Does not fit one session → `/fa:to-tickets`. It creates the sub-tasks.
+3. Then stop with one line: `Run /fa:implement` (or `/fa:implement <first
+   unblocked sub-task>`), ideally in a fresh session so the build starts with
+   a clean context.
 
 ## What this is not
 

@@ -42,6 +42,7 @@ Check:
 - Every part of the feature description — is it all there?
 - The decisions made during planning — are they reflected in the code?
 - The scope — did the implementation stay within bounds or add things that were not asked for?
+- UI — matches the Figma frame the ticket links (Figma MCP screenshot next to the built screen)
 - The tests — one at every seam the plan names and none elsewhere, and none of the three shapes `/fa:implement` bans (implementation-coupled, tautological, horizontal)
 
 Flag anything that was planned but missing. Flag anything that was built but not planned.

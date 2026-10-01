@@ -32,6 +32,10 @@ Before touching an area, also read that area's `AGENTS.md` if one exists
 ## Session rhythm
 
 - Start: the last diary entry is already in context; confirm it.
-- Feature: `/fa:grill-with-docs` (design, glossary, ADRs) → `/fa:implement`
-  (test-first at the agreed seams) → `/fa:review` → `/fa:pr` → `/fa:sync`.
-- End: `/fa:remember save`. Built UI: `/fa:imprint`. Stuck: `/fa:recover`.
+- Feature: `/fa:grill-with-docs <ticket key, if any>` (design, glossary,
+  ADRs; creates the ticket and splits the plan when needed) → `/fa:implement`
+  (test-first at the agreed seams) → `/fa:review` → `/fa:sync` →
+  `/fa:remember save` → commit → `/fa:pr`, so the context files and the
+  diary entry are in the branch the PR covers.
+- End of any session: `/fa:remember save`. Built UI: `/fa:imprint`. Stuck:
+  `/fa:recover`.

@@ -1,7 +1,7 @@
 {
   "name": "fa",
-  "version": "1.2.2",
-  "description": "FA AI Development Standard: the process skills (grill-with-docs, implement, review, pr, sync, recover, remember, diary, imprint, audit), the repo scaffold (init), and the TFA .NET skills (development guard, FAST Core integration).",
+  "version": "1.2.3",
+  "description": "FA AI Development Standard: the process skills (grill-with-docs, to-spec, to-tickets, implement, review, pr, sync, recover, remember, diary, imprint, audit), the repo scaffold (init), and the TFA .NET skills (development guard, FAST Core integration).",
   "author": {
     "name": "FA",
     "url": "https://github.com/alihassandbouk/fa-ai-standard-template"
