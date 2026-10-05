@@ -20,21 +20,22 @@ this repo and updated from it.
 
 A Claude Code plugin is a folder with a manifest. When it is enabled, Claude
 Code loads its `skills/` (as `/fa:<name>`), runs its `hooks/`, connects its
-`.mcp.json` servers, and puts nothing else in your session. Only each skill's
-one-paragraph description is loaded every session; the body loads when the
-skill runs.
+`.mcp.json` servers, and puts nothing else in your session. Only the
+one-line descriptions of the model-invoked skills are loaded every session;
+a body loads when its skill runs.
 
 What the plugin cannot do is change a project. That is what `/fa:init` is
 for: it copies `template/` into the repo. The scaffold's `CLAUDE.md` imports
-the four `context/*.md` files, so from then on every session in that repo
-starts with the project's overview, architecture, code standards and UI rules
-already in context. Facts live in those files; procedures live in the skills.
+the five `context/*.md` files, so from then on every session in that repo
+starts with the project's overview, architecture, code standards, UI rules
+and glossary already in context. Facts live in those files; procedures live in the skills.
 
 The normal life of a project:
 
 ```
 /fa:init          once, scaffolds the standard
 /fa:audit         once, fills the context files from existing code
+/fa:remember restore  at the start of every session (a hook reminds you)
 /fa:grill-with-docs   before each feature: interview, glossary, ADRs, plan;
                       runs to-spec when there is no ticket and to-tickets when
                       the plan exceeds one session
@@ -144,8 +145,9 @@ command and why it is worth having.
 | [GitHub CLI](https://cli.github.com) | package manager, then `gh auth login` | PRs and issues from the terminal. |
 
 Several skills here are adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills)
-(MIT): grill-with-docs, implement's TDD rules, recover's bug loop, review's
-parallel axes and smell baseline, pr, and the git guardrails hook.
+(MIT): grill-with-docs, to-spec, to-tickets, implement's TDD rules, recover's
+bug loop, review's parallel axes and smell baseline, pr (itself from Dex
+Horthy's `show-me`), and the git guardrails hook. `writing-for-agents` is vendored unchanged.
 
 Third-party skills install into `~/.claude/skills/` (add `-g` to the
 `npx skills add` command for that) or into the project's `.claude/skills/`.
@@ -172,15 +174,17 @@ Update them with `npx skills update`.
 | `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard, layer templates, refactoring workflow, checklists. |
 | `/fa:tfa-integration-fast-core` | Integrating with FAST Core: REST, SSO, or DB views. |
 | `/fa:efcore-d2-db-diagram` | Generate a D2 entity-relationship diagram from EF Core models into `docs/schema.d2`. |
+| `/fa:writing-for-agents` | Editing a skill, `AGENTS.md` or `CLAUDE.md`. Matt Pocock's writing reference, vendored unchanged. |
 
-Claude also invokes a skill on its own when a request matches its
-description; typing the name is not required.
+Seven skills run only when you type them: `init`, `audit`,
+`grill-with-docs`, `implement`, `sync`, `pr` and `recover`. Every other skill
+also fires on its own when a request matches its description.
 
 ## Hooks
 
-- **SessionStart**: prints the last entry of `diary/repo/` into context, so
-  every session starts with the previous handoff, plus a one-line reminder to
-  search the personal diary before touching an area with history.
+- **SessionStart**: one line reminding you to run `/fa:remember restore`
+  (in a repo with a `diary/repo/`) and to search the personal diary before
+  touching an area with history.
 - **PreToolUse** on Bash: blocks destructive git before it runs (force push,
   `reset --hard`, `clean -f`, `branch -D`, `checkout .`, `restore .`). Plain
   `git push` stays allowed.
@@ -230,6 +234,6 @@ claude plugin validate .   # manifests, hooks, MCP entries
 claude --plugin-dir .      # a session with the working copy loaded
 ```
 
-Rules of the repo are in `CLAUDE.md`: keep skill descriptions short (they
-load every session), put facts in `template/` context files and procedures in
-skills, and bump `version` on every release.
+Rules of the repo are in `CLAUDE.md`: skills and context files are written
+under `writing-for-agents`, facts go in `template/` context files and
+procedures in skills, and `version` is bumped on every release.

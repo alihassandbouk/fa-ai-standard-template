@@ -1,14 +1,13 @@
 ---
 name: pr
-description: Write a pull request body: one visual that makes the change clear, before-and-after evidence from a real run, and a merge-danger note (one-way or two-way door, blast radius). Use when opening or describing a PR.
+description: Write the PR body: one visual, before-and-after evidence from a real run, merge danger.
+disable-model-invocation: true
 ---
 
 # pr
 
-Adapted from Matt Pocock's `pr` skill (MIT), itself from Dex Horthy's `show-me`.
-
-Skip preambles. Use the domain language in `context/glossary.md`. Name the
-ticket key in the title.
+Start at the Summary heading, in the domain language of
+`context/glossary.md`, with the ticket key in the title.
 
 ```markdown
 ## Summary
@@ -32,7 +31,7 @@ interactions, or a diff of one of those when the shape already existed>
 - ADR-00X <title>   (omit the section if none)
 ```
 
-Pick the smallest view that makes the point. Screenshots for visual changes,
-a real test invocation and its output otherwise; never a description of
-evidence in place of evidence. A change that is cheap to roll back is a
-two-way door; a migration, a deleted column, a changed contract is one-way.
+Pick the smallest view that makes the point. Evidence is the artifact
+itself: screenshots for visual changes, a real test invocation and its output
+otherwise. A change that is cheap to roll back is a two-way door; a
+migration, a deleted column, a changed contract is one-way.

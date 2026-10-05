@@ -1,21 +1,19 @@
 ---
 name: implement
-description: Build the work described by a plan from /fa:grill-with-docs or a ticket, test-first at the pre-agreed seams, then hand to /fa:review. Use when the design is settled and it is time to write the code.
+description: Build a grill plan or a ticket test-first at its agreed seams, then hand to /fa:review. Argument: a sub-task key.
 disable-model-invocation: true
 ---
 
 # implement
 
-TDD rules adapted from Matt Pocock's `tdd` skill (MIT).
-
 ## Inputs
 
 The plan from `/fa:grill-with-docs` if one exists in the conversation, else
 the ticket. Given a sub-task key as the argument, fetch it (`getJiraIssue`):
-its *What to build*, acceptance criteria and seams are the plan. Read `context/glossary.md` so names match the domain, the
-ADRs of the area, and the `AGENTS.md` of every area you touch. If the plan
-names no seams, ask for them before writing a test: **no test at an
-unconfirmed seam.**
+its *What to build*, acceptance criteria and seams are the plan. Read
+`context/glossary.md` so names match the domain, the ADRs of the area, and
+the `AGENTS.md` of every area you touch. If the plan names no seams, ask for
+them first: every test lives at a confirmed seam.
 
 ## The loop
 
@@ -23,13 +21,12 @@ One vertical slice at a time, each a tracer bullet through every layer:
 
 1. **Red.** Write one failing test at a seam, named as a capability
    ("user can checkout with a valid cart"). Watch it fail.
-2. **Green.** Write only enough code to pass it. No speculative features.
+2. **Green.** Write only enough code to pass it.
 3. **Refactor.** Typecheck, run that test file, then tidy what the slice
    touched while it is green: duplication, names, nesting. No behaviour change.
    Repeat with the next slice.
 
-Run the full suite once at the end. `/fa:review` reports the smells you
-missed; you apply the ones the developer picks.
+Run the full suite once at the end.
 
 Three test shapes are banned:
 
@@ -43,12 +40,13 @@ Three test shapes are banned:
 
 ## When the plan is wrong
 
-If implementation shows a decision was wrong, stop, say so, and go back to
-`/fa:grill-with-docs` for that decision. Do not diverge silently from an ADR.
+If implementation shows a decision was wrong, stop, say so, and ask the
+developer to run `/fa:grill-with-docs` for that decision. An ADR stays in
+force until a new one supersedes it (`docs/adr/README.md`).
 
 ## Closing
 
-Full suite green, then `/fa:review`. Address what the developer picks from
-the report, then `/fa:sync` and `/fa:remember save`. Commit to the current
-branch with a message that names the ticket. A sub-task is transitioned to
-Done (`transitionJiraIssue`) once its acceptance criteria hold. `/fa:pr` writes the PR body.
+Full suite green, then `/fa:review`; it reports the smells you missed, and
+you apply the ones the developer picks. A sub-task is transitioned to Done
+(`transitionJiraIssue`) once its acceptance criteria hold. Then stop with one
+line: `Run /fa:sync`; the session rhythm in `CLAUDE.md` carries on from there.
