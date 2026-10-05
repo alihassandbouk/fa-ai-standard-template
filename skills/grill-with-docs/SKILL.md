@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: Before building a feature, interview the developer relentlessly until every design decision is settled, writing the glossary and ADRs as terms and decisions crystallise. Ends with an implementation plan that names the seams to test, creates the Jira ticket if none exists, splits the plan into sub-tasks if it exceeds one session, then hands off to /fa:implement. Argument: the ticket key, if there is one. Use before any feature; trigger phrases "grill me", "let's design", "before we build".
+description: Interview the developer until every design decision is settled, writing ADRs as decisions land, then hand a plan to /fa:implement. Argument: the ticket key, if there is one.
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash, Agent, Write, Edit
 ---

@@ -1,6 +1,7 @@
 ---
 name: sync
-description: Keep the AI context true after a change lands. Diffs the branch against main, rewrites the lines in context/*.md and the touched areas' AGENTS.md that the change made false, and flags decisions with no ADR and tickets whose ask changed while their tests did not. Run /fa:sync after /fa:review and before /fa:pr, so the context changes ship in the same PR.
+description: After review and before the PR: rewrite the context/*.md and AGENTS.md lines the branch made false, and flag decisions with no ADR.
+disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 ---
 

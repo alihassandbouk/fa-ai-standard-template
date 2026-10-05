@@ -1,6 +1,7 @@
 ---
 name: audit
-description: Fill the project's AI context from the codebase — the context/*.md reference files CLAUDE.md imports every session, plus a nested AGENTS.md for each area with its own conventions. Run /fa:audit on a repo whose context files still have _TODO_ sections, after a change that made them stale, or on one area (/fa:audit src/auth). Adds only what is missing; never overwrites what a human wrote.
+description: Fill the context/*.md files and nested AGENTS.md from the codebase, adding only what is missing. Argument: an area path to limit the scope.
+disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Agent, AskUserQuestion
 ---
 

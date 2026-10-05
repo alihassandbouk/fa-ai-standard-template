@@ -1,6 +1,6 @@
 ---
 name: tfa-integration-fast-core
-description: Integrate a third-party system with the FAST Core .NET platform — REST API (server-to-server or client-to-server), SSO against Identity Server 5 (backend-for-frontend or SPA), or read-only database views. Asks the user to pick the method first, then follows the matching guide. Use for any FAST Core / IMS integration, SSO sign-in, or FASTDB view mapping.
+description: Integrate a system with the FAST Core .NET platform by REST API, SSO against its Identity Server, or read-only database views. Use for any FAST Core, IMS or FASTDB integration.
 ---
 
 # TFA Integration Fast Core

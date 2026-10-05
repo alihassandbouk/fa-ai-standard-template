@@ -1,6 +1,6 @@
 ---
 name: diary
-description: "Read from and write to the developer's personal work diary — a single append-only journal at ~/.claude/diary shared by every Claude Code session in every folder on this machine, optionally synced to a private git remote. Use it to WRITE at the end of a session, after any key decision (architecture, tooling, schema, deploy, tradeoff accepted), after heavy research or long debugging, and whenever something was learned that a future session would otherwise have to rediscover. Use it to READ whenever the user refers to past work — 'what did we decide about X', 'why did I do it this way', 'last week', 'a few days ago', 'remind me', 'we already fixed this' — or before starting work on an area that may have prior history."
+description: The developer's personal work diary, shared by every repo on this machine. Write to it after a decision, after a long debug or research, and at session end; search it when the developer refers to earlier work, or before touching an area that may have history.
 ---
 
 # Work diary

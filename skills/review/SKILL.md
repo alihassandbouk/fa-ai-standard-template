@@ -1,6 +1,6 @@
 ---
 name: review
-description: After building a feature, verify it matches what was planned, respects the system architecture and design standards, and is ready for production. Reports issues clearly so the developer decides what to fix.
+description: Review a built feature against its plan, the architecture and production readiness; the developer picks what to fix. Use after /fa:implement, or when asked to review a branch.
 ---
 
 Building is not done when the code runs. It is done when the code is correct.

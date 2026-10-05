@@ -1,6 +1,6 @@
 ---
 name: to-spec
-description: Run by /fa:grill-with-docs when its plan has no ticket: turn the settled design into the Jira ticket the work is tracked under. No interview, only synthesis of what was decided. Also typeable on its own after a grill session.
+description: Turn a settled grill plan into the Jira ticket the work is tracked under. Use when /fa:grill-with-docs ends with no ticket.
 ---
 
 # to-spec

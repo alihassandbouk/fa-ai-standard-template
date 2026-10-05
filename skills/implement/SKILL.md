@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Build the work described by a plan from /fa:grill-with-docs or a ticket, test-first at the pre-agreed seams, then hand to /fa:review. Use when the design is settled and it is time to write the code.
+description: Build a grill plan or a ticket test-first at its agreed seams, then hand to /fa:review. Argument: a sub-task key.
 disable-model-invocation: true
 ---
 

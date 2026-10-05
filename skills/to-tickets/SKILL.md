@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: Run by /fa:grill-with-docs when its plan does not fit one session: break the plan into Jira sub-tasks of its ticket, each a tracer bullet that fits one session and declares which sub-tasks block it. Also typeable on its own after a grill session.
+description: Break a grill plan into Jira sub-tasks of its ticket, each a tracer bullet that fits one session and names the sub-tasks that block it. Use when /fa:grill-with-docs ends with a plan larger than one session.
 ---
 
 # to-tickets

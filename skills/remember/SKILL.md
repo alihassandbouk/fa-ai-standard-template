@@ -1,6 +1,6 @@
 ---
 name: remember
-description: Save what matters at the end of a session so the next session picks up exactly where you left off, or restore context at the start of a new session. Saves to the repo diary (diary/repo/YYYY-MM-DD.<author>.md, committed) — append-only session history with the handoff built in. Personal or cross-repo learnings go to the global diary instead (see the diary skill).
+description: Carry a session's handoff through the committed repo diary: `save` at the end of a session, `restore` at the start of one.
 ---
 
 AI has no memory between sessions. Every new session starts blank. This skill fixes that.

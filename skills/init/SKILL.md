@@ -1,6 +1,7 @@
 ---
 name: init
-description: Scaffold the FA AI Development Standard into the current repo — CLAUDE.md with the non-negotiables, the context/ reference files, docs/adr/, diary/ and .gitignore entries. Run once in a new or existing project; never overwrites a file that already exists. Use when the user says "init the standard", "set up this repo for AI", "bootstrap the context", or when a repo has no CLAUDE.md.
+description: Scaffold the FA AI Development Standard into the current repo from template/; never overwrites an existing file.
+disable-model-invocation: true
 allowed-tools: Bash, Read, Write, Edit, Glob, AskUserQuestion
 ---
 

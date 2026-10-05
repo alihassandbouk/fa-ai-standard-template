@@ -1,6 +1,6 @@
 ---
 name: tfa-development-guard
-description: Build and review .NET/C# code against the TFA Clean Architecture standard — Domain, Application, Infrastructure and Api layers, EF Core code-first with SQL Server migrations, read-only view access, repositories, services, DTOs, controllers, appsettings-driven configuration, Serilog audit logging, and the pre-deployment checklist. Use when creating or reviewing any .NET solution, adding an entity or view, scaffolding a layer, refactoring C# code (skinny controllers, extracting services, reducing duplication and nesting), or preparing a deployment.
+description: Build and review .NET/C# code against the TFA Clean Architecture standard. Use for any .NET work: a new solution, an entity or view, a layer, a refactor, or a deployment.
 ---
 
 # .NET/C# Best Practices (Clean Architecture + EF Core)

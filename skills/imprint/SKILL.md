@@ -1,6 +1,6 @@
 ---
 name: imprint
-description: After building any UI, verify it against the design system and capture the composition pattern it follows — so every screen built after this one assembles the system the same way. Writes to context/ui-patterns.md. Verifies against context/ui-rules.md.
+description: Verify a built UI against context/ui-rules.md and record its composition pattern in context/ui-patterns.md. Use after any screen or component is built.
 ---
 
 UI consistency does not happen by accident. It happens because every screen is built with awareness of what already exists.

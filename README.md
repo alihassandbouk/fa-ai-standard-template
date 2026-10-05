@@ -20,9 +20,9 @@ this repo and updated from it.
 
 A Claude Code plugin is a folder with a manifest. When it is enabled, Claude
 Code loads its `skills/` (as `/fa:<name>`), runs its `hooks/`, connects its
-`.mcp.json` servers, and puts nothing else in your session. Only each skill's
-one-paragraph description is loaded every session; the body loads when the
-skill runs.
+`.mcp.json` servers, and puts nothing else in your session. Only the
+one-line descriptions of the model-invoked skills are loaded every session;
+a body loads when its skill runs.
 
 What the plugin cannot do is change a project. That is what `/fa:init` is
 for: it copies `template/` into the repo. The scaffold's `CLAUDE.md` imports
@@ -144,8 +144,9 @@ command and why it is worth having.
 | [GitHub CLI](https://cli.github.com) | package manager, then `gh auth login` | PRs and issues from the terminal. |
 
 Several skills here are adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills)
-(MIT): grill-with-docs, implement's TDD rules, recover's bug loop, review's
-parallel axes and smell baseline, pr, and the git guardrails hook.
+(MIT): grill-with-docs, to-spec, to-tickets, implement's TDD rules, recover's
+bug loop, review's parallel axes and smell baseline, pr, and the git
+guardrails hook. `writing-for-agents` is vendored unchanged.
 
 Third-party skills install into `~/.claude/skills/` (add `-g` to the
 `npx skills add` command for that) or into the project's `.claude/skills/`.
@@ -172,9 +173,11 @@ Update them with `npx skills update`.
 | `/fa:tfa-development-guard` | Any .NET/C# work: Clean Architecture + EF Core standard, layer templates, refactoring workflow, checklists. |
 | `/fa:tfa-integration-fast-core` | Integrating with FAST Core: REST, SSO, or DB views. |
 | `/fa:efcore-d2-db-diagram` | Generate a D2 entity-relationship diagram from EF Core models into `docs/schema.d2`. |
+| `/fa:writing-for-agents` | Editing a skill, `AGENTS.md` or `CLAUDE.md`. Matt Pocock's writing reference, vendored unchanged. |
 
-Claude also invokes a skill on its own when a request matches its
-description; typing the name is not required.
+Seven skills run only when you type them: `init`, `audit`,
+`grill-with-docs`, `implement`, `sync`, `pr` and `recover`. Every other skill
+also fires on its own when a request matches its description.
 
 ## Hooks
 

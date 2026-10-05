@@ -1,6 +1,7 @@
 ---
 name: pr
-description: Write a pull request body: one visual that makes the change clear, before-and-after evidence from a real run, and a merge-danger note (one-way or two-way door, blast radius). Use when opening or describing a PR.
+description: Write the PR body: one visual, before-and-after evidence from a real run, merge danger.
+disable-model-invocation: true
 ---
 
 # pr
