@@ -1,23 +1,20 @@
 ---
 name: to-spec
-description: Run by /fa:grill-with-docs when its plan has no ticket: turn the settled design into the Jira ticket the work is tracked under. No interview, only synthesis of what was decided. Also typeable on its own after a grill session.
+description: Turn a settled grill plan into the Jira ticket the work is tracked under. Use when /fa:grill-with-docs ends with no ticket.
 ---
 
 # to-spec
 
-Adapted from Matt Pocock's `to-spec` (MIT).
-
 Work that starts from a developer, not from a business ticket, has no key for
 commits, the PR and `/fa:sync` to name. This skill creates that ticket from
-the grill session. Run it only when no ticket exists; the business path never
-needs it.
+the grill session; the business path starts with a ticket and skips it.
 
 ## Inputs
 
 The plan from `/fa:grill-with-docs` in this conversation, `context/glossary.md`,
-and the ADRs grill wrote. Do not interview. Every line of the ticket is
-something the developer already said; a line they cannot remember deciding is
-a defect.
+and the ADRs grill wrote. Synthesis only: every line of the ticket is
+something the developer already said, and a line they cannot remember
+deciding is a defect.
 
 ## Steps
 
@@ -28,9 +25,9 @@ a defect.
 3. **Publish** to the Jira project named under *Work tracking* in
    `context/project-overview.md`, through the Atlassian MCP server
    (`createJiraIssue`). Server not connected: stop and ask the developer to
-   sign in with `/mcp`. Do not write a copy to disk.
-4. **Report the key.** From here it is the ticket: `/fa:implement` names it in
-   commits, `/fa:pr` in the title.
+   sign in with `/mcp`. The ticket lives in Jira only.
+4. **Report the key.** From here it is the ticket: commits, the PR title and
+   `/fa:sync` name it.
 
 ```markdown
 ## Problem
@@ -52,9 +49,6 @@ a defect.
 <user-facing behaviour only: what each language shows; omit for technical work>
 ```
 
-No file paths or code snippets in the body, they go stale. Exception: a
+The body is prose: file paths and code snippets go stale. Exception: a
 snippet that encodes a decision more precisely than prose (a state machine, a
 schema, a type shape), trimmed to the decision.
-
-Then: plan bigger than one session → `/fa:to-tickets`. Otherwise
-`/fa:implement`.

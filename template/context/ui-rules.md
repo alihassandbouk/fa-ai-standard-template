@@ -12,6 +12,8 @@ DGA Platforms Code, the Saudi national design system, through its React
 adapter `platformscode-new-react`. `/fa:dga` sets it up on the first UI
 session and holds the how-to; lint rejects a raw `button`, `input`,
 `select`, `table` or `dialog` in product code.
+Before building a screen, `context/ui-patterns.md` names the composition to
+match; `/fa:imprint` records each new one.
 
 ## Rules
 

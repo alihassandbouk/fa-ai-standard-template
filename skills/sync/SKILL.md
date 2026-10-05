@@ -1,13 +1,11 @@
 ---
 name: sync
-description: Keep the AI context true after a change lands. Diffs the branch against main, rewrites the lines in context/*.md and the touched areas' AGENTS.md that the change made false, and flags decisions with no ADR and tickets whose ask changed while their tests did not. Run /fa:sync after /fa:review and before /fa:pr, so the context changes ship in the same PR.
+description: After review and before the PR: rewrite the context/*.md and AGENTS.md lines the branch made false, and flag decisions with no ADR.
+disable-model-invocation: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 ---
 
 # sync — keep the context current
-
-Context files describe the present. A merged change that leaves them
-describing the past misleads every later session.
 
 ## Steps
 
@@ -23,15 +21,15 @@ describing the past misleads every later session.
    - UI → `context/ui-rules.md` and `context/ui-patterns.md`
    - EF Core entities, configurations or migrations → `docs/schema.d2` is stale: flag "regenerate with `/fa:efcore-d2-db-diagram`"
 3. **Edit surgically.** Rewrite the one line that is now false; add the one
-   line that is now missing. Never append "previously X, now Y". Never rewrite
-   a paragraph. A brand-new area with real conventions gets an `AGENTS.md` in
-   the `/fa:audit` shape and a line in `context/architecture.md`.
-4. **Flag, do not fix:**
-   - a decision that is hard to reverse, surprising without context, and the
-     result of a real trade-off, with no ADR in `docs/adr/` → *needs ADR, run
-     `/fa:grill-with-docs`*
+   line that is now missing. The unit is the line, by the rewrite-to-present
+   rule in `CLAUDE.md`; a paragraph is left as it is. A brand-new area with
+   real conventions gets an `AGENTS.md` in the `/fa:audit` shape and a line
+   in `context/architecture.md`.
+4. **Flag, leave untouched:**
+   - an ADR-worthy decision (`docs/adr/README.md`) with no ADR in `docs/adr/`
+     → *needs ADR, run `/fa:grill-with-docs`*
    - a ticket (named in the diff or commits) whose ask changed while its tests
      did not → *non-negotiable violation*
-   - curated prose the code now contradicts → list it, leave it
-5. **Report:** edited (`file:line`), created, flagged. Then remind the
-   developer to run `/fa:remember save`, commit, then `/fa:pr`.
+   - curated prose the code now contradicts → list it
+5. **Report:** edited (`file:line`), created, flagged. Then stop with one
+   line naming the next step of the session rhythm in `CLAUDE.md`.

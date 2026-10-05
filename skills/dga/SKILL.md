@@ -1,6 +1,7 @@
 ---
 name: dga
-description: Build UI in a React project from the DGA Platforms Code components. Use when writing or reviewing any screen, form, table, modal or navigation in a React, TypeScript and Tailwind project, and on a project's first UI session to set the package up.
+description: Build and review UI in a React project from the official DGA Platforms Code components; sets the package up on the first UI session. Use for any UI work in a React project.
+allowed-tools: Read
 ---
 
 # dga

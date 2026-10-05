@@ -1,16 +1,18 @@
-# Quality Gate
+# Quality gate
 
-Before delivery:
+Every line holds before delivery:
 
-- Confirm the selected DbContext.
-- Confirm source files inspected.
-- Validate table names against Fluent API and migrations.
-- Include primary keys.
-- Include foreign keys.
-- Include cardinalities.
-- Include join tables unless hidden by user choice.
-- Include owned types according to user choice.
-- Hide technical tables only if configured and list them in the summary.
-- Run `d2 fmt` when available.
-- Use full dot-notation for edges inside containers.
-- Provide render command.
+- [ ] The selected DbContext is clear.
+- [ ] All `DbSet<T>` entities are considered.
+- [ ] Fluent API configurations are read.
+- [ ] Migrations are checked when present.
+- [ ] Table names and schema names match EF Core mapping.
+- [ ] Primary keys are present.
+- [ ] Foreign keys and cardinalities are represented.
+- [ ] Owned types are handled according to user choice.
+- [ ] Many-to-many join tables are explicit unless the user asked otherwise.
+- [ ] Hidden technical tables are listed in the final summary.
+- [ ] D2 syntax is valid with `d2 fmt`.
+- [ ] Edge endpoints use full dot-notation when inside containers.
+- [ ] The diagram remains readable and avoids crossing-heavy layouts.
+- [ ] The render command is provided.
