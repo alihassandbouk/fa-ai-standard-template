@@ -9,7 +9,7 @@ allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Agent, AskUserQuestion
 
 `CLAUDE.md` imports `context/*.md` into every session, so what this skill
 writes is what every future session knows. Write present-tense facts about the
-code as it is. No history, no plans.
+code as it is.
 
 ## What it writes
 
@@ -22,12 +22,12 @@ code as it is. No history, no plans.
 | `context/code-standards.md` | conventions observed in the code: naming, tests, errors, logging | replace `_TODO_` only |
 | `context/code-standards.md`, `## .NET standard` | the TFA rules from `${CLAUDE_PLUGIN_ROOT}/skills/tfa-development-guard/references/standards.md` | append if the repo is .NET and the heading is missing |
 | `docs/schema.d2` | the database diagram, generated with `/fa:efcore-d2-db-diagram` and linked from `context/architecture.md` under *Data & domain model* | .NET repos with a `DbContext`; create if missing |
-| `context/glossary.md` | the domain terms the code uses, one line each, vocabulary only | add missing terms; never redefine an existing one, flag it |
+| `context/glossary.md` | the domain terms the code uses, one line each, vocabulary only | add missing terms; an existing definition stays as written, a conflict is flagged |
 | `context/ui-rules.md` | design system package, RTL and i18n, accessibility | replace `_TODO_`; skip if no UI |
 | `<area>/AGENTS.md` | overview, key files, conventions, gotchas of one area | create only where the area has conventions the root files do not state |
 
-Never rewrite a line a human wrote. If the code contradicts curated content,
-list it under **Contradictions** in the report and leave the file alone.
+A line a human wrote stays as written; where the code contradicts it, list
+it under **Contradictions** in the report.
 
 ## Steps
 
@@ -62,7 +62,7 @@ list it under **Contradictions** in the report and leave the file alone.
 5. **Report:** what was written, what was skipped because it was curated,
    contradictions, and the `_TODO_`s still open.
 
-## Not this skill
+## Neighbours
 
-Tickets (`/fa:grill-with-docs` reads them), ADRs (it writes them), upkeep after a change (`/fa:sync`). A repo with no `context/` at all
-needs `/fa:init` first.
+Tickets and ADRs belong to `/fa:grill-with-docs`, upkeep after a change to
+`/fa:sync`. A repo with no `context/` at all needs `/fa:init` first.

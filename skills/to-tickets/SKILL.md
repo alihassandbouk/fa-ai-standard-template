@@ -5,11 +5,9 @@ description: Break a grill plan into Jira sub-tasks of its ticket, each a tracer
 
 # to-tickets
 
-Adapted from Matt Pocock's `to-tickets` (MIT).
-
 A plan that outlives the conversation has to live in the tracker, cut into
-pieces a fresh session can finish alone. A plan that fits one session does
-not need this: run `/fa:implement`.
+pieces a fresh session can finish alone. A plan that fits one session skips
+this and goes straight to `/fa:implement`.
 
 ## Inputs
 
@@ -30,7 +28,7 @@ Start from the plan's *Steps*; each is already meant to be a vertical slice.
   codebase, is the exception: sequence it as expand (add the new form beside
   the old), migrate (call sites in batches sized by blast radius, each blocked
   by expand), contract (delete the old form, blocked by every migrate).
-- No file paths or code snippets; the same prototype exception as `/fa:to-spec`.
+- Prose only, with the same snippet exception as `/fa:to-spec`.
 
 Test every slice with one question: *what can I demo when this is done?* No
 answer means a horizontal slice. Re-cut it.
@@ -47,7 +45,7 @@ published before that.
 Through the Atlassian MCP server, blockers first so every link names a real
 key: `createJiraIssue` as a Sub-task of the parent with the body below, then
 `createIssueLink` of type *Blocks* for each edge. Server not connected: stop
-and ask the developer to sign in with `/mcp`. Never edit or close the parent.
+and ask the developer to sign in with `/mcp`. The parent stays as it is.
 
 ```markdown
 ## What to build
@@ -63,5 +61,5 @@ and ask the developer to sign in with `/mcp`. Never edit or close the parent.
 - KEY-12, or "none, can start now"
 ```
 
-Then: `/fa:implement <sub-task key>`, one sub-task per fresh session, working
-the frontier: every sub-task whose blockers are Done.
+Report the keys and the **frontier**: every sub-task whose blockers are Done.
+Each is one fresh session of `/fa:implement <key>`.

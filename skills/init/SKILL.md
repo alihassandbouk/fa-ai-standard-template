@@ -35,4 +35,4 @@ that variable is unset, it is `../../template/` relative to this SKILL.md.
 5. Report: files created, files skipped because they existed, and the next
    step (`/fa:audit`, or filling the remaining `_TODO_`s).
 
-Do not commit. Do not touch files outside the template's paths.
+The developer commits. Touch only the template's paths.

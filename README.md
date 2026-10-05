@@ -145,8 +145,8 @@ command and why it is worth having.
 
 Several skills here are adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills)
 (MIT): grill-with-docs, to-spec, to-tickets, implement's TDD rules, recover's
-bug loop, review's parallel axes and smell baseline, pr, and the git
-guardrails hook. `writing-for-agents` is vendored unchanged.
+bug loop, review's parallel axes and smell baseline, pr (itself from Dex
+Horthy's `show-me`), and the git guardrails hook. `writing-for-agents` is vendored unchanged.
 
 Third-party skills install into `~/.claude/skills/` (add `-g` to the
 `npx skills add` command for that) or into the project's `.claude/skills/`.

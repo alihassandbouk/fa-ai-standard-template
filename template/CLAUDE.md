@@ -22,7 +22,8 @@ Before touching an area, also read that area's `AGENTS.md` if one exists
 
 ## Non-negotiables
 
-- Never edit an ADR — supersede it.
+- Every ADR-worthy decision gets an ADR, and an ADR is superseded, never
+  edited: `docs/adr/README.md`.
 - Changing what a ticket asks for means changing its tests.
 - Reference files (`context/*.md`, `AGENTS.md`) are rewritten to reflect the
   current state, never appended with "previously X, now Y."
@@ -35,7 +36,7 @@ Before touching an area, also read that area's `AGENTS.md` if one exists
 - Feature: `/fa:grill-with-docs <ticket key, if any>` (design, glossary,
   ADRs; creates the ticket and splits the plan when needed) → `/fa:implement`
   (test-first at the agreed seams) → `/fa:review` → `/fa:sync` →
-  `/fa:remember save` → commit → `/fa:pr`, so the context files and the
+  `/fa:remember save` → commit (the message names the ticket) → `/fa:pr`, so the context files and the
   diary entry are in the branch the PR covers.
 - End of any session: `/fa:remember save`. Built UI: `/fa:imprint`. Stuck:
   `/fa:recover`.
