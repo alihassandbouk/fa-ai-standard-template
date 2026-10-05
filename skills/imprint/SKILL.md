@@ -1,6 +1,7 @@
 ---
 name: imprint
 description: Verify a built UI against context/ui-rules.md and record its composition pattern in context/ui-patterns.md. Use after any screen or component is built.
+allowed-tools: Read, Grep, Glob, Write, Edit
 ---
 
 # imprint

@@ -1,6 +1,7 @@
 ---
 name: tfa-development-guard
 description: Build and review .NET/C# code against the TFA Clean Architecture standard. Use for any .NET work: a new solution, an entity or view, a layer, a refactor, or a deployment.
+allowed-tools: Read
 ---
 
 # .NET/C# Best Practices (Clean Architecture + EF Core)

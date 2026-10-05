@@ -26,15 +26,16 @@ a body loads when its skill runs.
 
 What the plugin cannot do is change a project. That is what `/fa:init` is
 for: it copies `template/` into the repo. The scaffold's `CLAUDE.md` imports
-the four `context/*.md` files, so from then on every session in that repo
-starts with the project's overview, architecture, code standards and UI rules
-already in context. Facts live in those files; procedures live in the skills.
+the five `context/*.md` files, so from then on every session in that repo
+starts with the project's overview, architecture, code standards, UI rules
+and glossary already in context. Facts live in those files; procedures live in the skills.
 
 The normal life of a project:
 
 ```
 /fa:init          once, scaffolds the standard
 /fa:audit         once, fills the context files from existing code
+/fa:remember restore  at the start of every session (a hook reminds you)
 /fa:grill-with-docs   before each feature: interview, glossary, ADRs, plan;
                       runs to-spec when there is no ticket and to-tickets when
                       the plan exceeds one session
@@ -233,6 +234,6 @@ claude plugin validate .   # manifests, hooks, MCP entries
 claude --plugin-dir .      # a session with the working copy loaded
 ```
 
-Rules of the repo are in `CLAUDE.md`: keep skill descriptions short (they
-load every session), put facts in `template/` context files and procedures in
-skills, and bump `version` on every release.
+Rules of the repo are in `CLAUDE.md`: skills and context files are written
+under `writing-for-agents`, facts go in `template/` context files and
+procedures in skills, and `version` is bumped on every release.

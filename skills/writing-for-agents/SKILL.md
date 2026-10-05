@@ -1,6 +1,7 @@
 ---
 name: writing-for-agents
 description: Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md.
+allowed-tools: Read
 ---
 Vendored unchanged from Matt Pocock's `writing-for-agents` (MIT, mattpocock/skills@3216582, 2026-08-19); refresh it from upstream rather than editing it here.
 

@@ -1,6 +1,7 @@
 ---
 name: remember
 description: Carry a session's handoff through the committed repo diary: `save` at the end of a session, `restore` at the start of one.
+allowed-tools: Read, Bash, Write, Edit
 ---
 
 # remember

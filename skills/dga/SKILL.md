@@ -1,6 +1,7 @@
 ---
 name: dga
 description: Build and review UI in a React project from the official DGA Platforms Code components; sets the package up on the first UI session. Use for any UI work in a React project.
+allowed-tools: Read
 ---
 
 # dga

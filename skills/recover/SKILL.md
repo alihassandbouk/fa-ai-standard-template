@@ -2,6 +2,7 @@
 name: recover
 description: Diagnose what kind of failure a build hit before choosing a targeted fix, a hard reset or a rethink.
 disable-model-invocation: true
+allowed-tools: Read
 ---
 
 # recover

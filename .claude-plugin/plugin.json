@@ -1,6 +1,6 @@
 {
   "name": "fa",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "FA AI Development Standard: the process skills (grill-with-docs, to-spec, to-tickets, implement, review, pr, sync, recover, remember, diary, imprint, audit, writing-for-agents), the repo scaffold (init), the DGA React UI skill (dga), and the TFA .NET skills (development guard, FAST Core integration).",
   "author": {
     "name": "FA",

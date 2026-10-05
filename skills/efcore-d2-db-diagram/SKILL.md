@@ -1,6 +1,7 @@
 ---
 name: efcore-d2-db-diagram
 description: Generate a D2 entity-relationship diagram from Entity Framework Core models. Use when asked for a database diagram, ERD or schema visual of a DbContext.
+allowed-tools: Read
 ---
 
 # EF Core D2 database diagram
