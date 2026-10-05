@@ -181,9 +181,9 @@ also fires on its own when a request matches its description.
 
 ## Hooks
 
-- **SessionStart**: prints the last entry of `diary/repo/` into context, so
-  every session starts with the previous handoff, plus a one-line reminder to
-  search the personal diary before touching an area with history.
+- **SessionStart**: one line reminding you to run `/fa:remember restore`
+  (in a repo with a `diary/repo/`) and to search the personal diary before
+  touching an area with history.
 - **PreToolUse** on Bash: blocks destructive git before it runs (force push,
   `reset --hard`, `clean -f`, `branch -D`, `checkout .`, `restore .`). Plain
   `git push` stays allowed.

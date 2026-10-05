@@ -32,7 +32,7 @@ Before touching an area, also read that area's `AGENTS.md` if one exists
 
 ## Session rhythm
 
-- Start: the last diary entry is already in context; confirm it.
+- Start: `/fa:remember restore`, and confirm what it found.
 - Feature: `/fa:grill-with-docs <ticket key, if any>` (design, glossary,
   ADRs; creates the ticket and splits the plan when needed) → `/fa:implement`
   (test-first at the agreed seams) → `/fa:review` → `/fa:sync` →

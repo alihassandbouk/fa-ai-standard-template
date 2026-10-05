@@ -6,9 +6,9 @@ description: The developer's personal work diary, shared by every repo on this m
 # Work diary
 
 A single global journal, shared across every project and every session.
-Storage: `~/.claude/diary/YYYY/MM/YYYY-MM-DD.<machine>.md` — one file per day
-per machine, entries appended in time order. The `diary` CLI is the only thing
-that should write to it — never hand-edit or overwrite a day file.
+Storage: `~/.claude/diary/YYYY/MM/YYYY-MM-DD.<machine>.md`, one file per day
+per machine, entries appended in time order. The `diary` CLI is the only
+writer of a day file.
 
 The CLI ships with this plugin: `${CLAUDE_PLUGIN_ROOT}/scripts/diary` (Python 3,
 no dependencies). Use that path unless `diary` is on PATH. It works locally
@@ -20,8 +20,8 @@ elsewhere.
 
 ## Reading
 
-Search before assuming something is new. Always run a search when the user
-refers to earlier work.
+Search before assuming something is new, and whenever the user refers to
+earlier work.
 
 ```bash
 diary search "postgres owner"                 # all terms must match (AND)
@@ -60,35 +60,36 @@ EOF
 `--project` defaults to the basename of the working directory; set it
 explicitly when the folder name is not the real project name.
 Pass `--session "$CLAUDE_SESSION_ID"` on the end-of-session entry when the id
-is available — the Stop hook uses it to tell whether the session was logged.
+is available; the Stop hook uses it to tell whether the session was logged.
 
 ### Syncing
 
 Run `diary sync` at the end of a session that wrote entries, and when a
 session opens on a machine that may be behind. It commits, pulls, and pushes
 in one step. If it reports it cannot reach the remote, the entries are still
-committed locally — say so and carry on rather than retrying in a loop.
+committed locally: say so and carry on.
 
 ### When to write
 
-- **End of every session** where real work happened — one `session` entry
+- **End of every session** where real work happened: one `session` entry
   covering what changed, what was decided, and what is still open.
-- **Immediately after a key decision** — architecture, dependency, schema,
+- **Immediately after a key decision**: architecture, dependency, schema,
   deploy topology, security tradeoff, or anything the user might reasonably
-  ask "why did we do it that way" about in a month. Do not wait for the end
-  of the session; write it while the reasoning is still exact.
-- **After heavy research or a long debug** — record the conclusion and the
+  ask "why did we do it that way" about in a month. Write it while the
+  reasoning is still exact.
+- **After heavy research or a long debug**: record the conclusion and the
   dead ends, so the next session does not repeat the search.
-- **After a non-obvious fix** — the symptom, the actual cause, and the fix.
+- **After a non-obvious fix**: the symptom, the actual cause, and the fix.
   Symptom wording matters: it is what the user will search for later.
-- **On request** — "log this", "note that down".
+- **On request**: "log this", "note that down".
 
 Skip it for trivial exchanges: a single lookup, a one-line edit, a question
 answered with no work done. An entry that says nothing costs future searches.
 
 ### What a good entry contains
 
-Write for a reader who has none of this session's context.
+Write for a reader who has none of this session's context. The repo diary
+(`/fa:remember`) follows the same advice.
 
 - Name things concretely: real file paths, real command names, real hostnames.
 - Record the *why*, not just the *what*. The what is recoverable from git; the
@@ -97,6 +98,8 @@ Write for a reader who has none of this session's context.
   part most often re-litigated.
 - Note anything still unverified, so a later session knows not to trust it.
 - Keep it to what would be useful in six months. Half a screen is usually right.
-
-Never put secrets in the diary — no passwords, tokens, private keys, or full
-connection strings. Refer to them by name (`GHCR_PAT`, `DATABASE_URL`) instead.
+- Secrets stay out. Any credential-like value (key, token, password,
+  passphrase, one-time code, private key, certificate, cookie, auth header,
+  connection string, webhook secret) is referred to by name (`GHCR_PAT`,
+  `DATABASE_URL`) or as `[REDACTED]`. When unsure whether a detail is
+  sensitive, treat it as sensitive.
