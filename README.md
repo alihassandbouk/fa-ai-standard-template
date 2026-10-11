@@ -49,13 +49,23 @@ The normal life of a project:
 ## Install
 
 ```bash
-claude plugin marketplace add alihassandbouk/fa-ai-standard-template
+claude plugin marketplace add https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin
 claude plugin install fa@fa-ai
 ```
 
 Or inside a session: `/plugin`, add the marketplace, install `fa`. The repo
-is fetched with your machine's git credentials, so a private repo needs an
-SSH key or a credential helper that can read it. Nothing else to configure.
+is private on Azure DevOps and is fetched with your machine's git
+credentials, so you need read access to the project and an SSH key or a
+credential helper (Git Credential Manager) that answers without prompting.
+
+Installed from the old GitHub repo? Switch once; removing the marketplace
+uninstalls `fa`, the last line reinstalls it:
+
+```bash
+claude plugin marketplace remove fa-ai
+claude plugin marketplace add https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin
+claude plugin install fa@fa-ai
+```
 
 Then in any project:
 
@@ -74,8 +84,10 @@ claude plugin marketplace update fa-ai
 claude plugin update fa@fa-ai
 ```
 
-Marketplaces registered through managed settings with `autoUpdate` refresh
-on their own.
+Auto-update is off for marketplaces you add yourself; turn it on in
+`/plugin` → Marketplaces, or rely on managed settings below. It runs git
+without prompting, so it only works while your credential helper holds a
+valid token.
 
 ## Enterprise rollout
 
@@ -92,13 +104,13 @@ kept current, and cannot add marketplaces outside the organisation:
 {
   "extraKnownMarketplaces": {
     "fa-ai": {
-      "source": { "source": "github", "repo": "alihassandbouk/fa-ai-standard-template" },
+      "source": { "source": "git", "url": "https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin" },
       "autoUpdate": true
     }
   },
   "enabledPlugins": { "fa@fa-ai": true },
   "strictKnownMarketplaces": [
-    { "source": "github", "repo": "alihassandbouk/*" }
+    { "source": "git", "url": "https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin" }
   ]
 }
 ```

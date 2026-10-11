@@ -4,7 +4,7 @@
   "description": "FA AI Development Standard plugins.",
   "owner": {
     "name": "FA",
-    "url": "https://github.com/alihassandbouk/fa-ai-standard-template"
+    "url": "https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin"
   },
   "plugins": [
     {

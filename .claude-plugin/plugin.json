@@ -1,12 +1,12 @@
 {
   "name": "fa",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "FA AI Development Standard: the process skills (grill-with-docs, to-spec, to-tickets, implement, review, pr, sync, recover, remember, diary, imprint, audit, writing-for-agents), the repo scaffold (init), the DGA React UI skill (dga), and the TFA .NET skills (development guard, FAST Core integration).",
   "author": {
     "name": "FA",
-    "url": "https://github.com/alihassandbouk/fa-ai-standard-template"
+    "url": "https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin"
   },
-  "repository": "https://github.com/alihassandbouk/fa-ai-standard-template",
+  "repository": "https://dev.azure.com/fatfs2020/FA-Agent-Plugin/_git/FA-Agent-Plugin",
   "keywords": [
     "fa",
     "standard",
